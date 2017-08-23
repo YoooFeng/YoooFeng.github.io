@@ -105,7 +105,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/API_Gateway.pic/Riot的Zuul架构图.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/API_Gateway.pic/Orange的架构图.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/API_Gateway.pic/Tyk的架构图.png">
-<meta property="og:updated_time" content="2017-08-23T06:28:07.163Z">
+<meta property="og:updated_time" content="2017-08-23T06:36:18.608Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="常用API Gateway简介">
 <meta name="twitter:description" content="初衷&amp;emsp;&amp;emsp;API Gateway是与微服务（MicroService）这个概念一同兴起的一种架构，用于解决微服务过于分散，没有统一出入口进行流量管理的问题。当一个大的应用拆分成一个个微服务时，不同的微服务具有不同的职责，但是它们会有一些通用的功能如授权、流量监控和控制、日志统计等，在传统的单体应用中，这些功能一般是内嵌在应用程序中，在微服务框架下，继续使用内嵌的方式会造成非常高的">
@@ -372,6 +372,7 @@
 
       
         <h5 id="初衷"><a href="#初衷" class="headerlink" title="初衷"></a>初衷</h5><p>&emsp;&emsp;API Gateway是与微服务（MicroService）这个概念一同兴起的一种架构，用于解决微服务过于分散，没有统一出入口进行流量管理的问题。当一个大的应用拆分成一个个微服务时，不同的微服务具有不同的职责，但是它们会有一些通用的功能如授权、流量监控和控制、日志统计等，在传统的单体应用中，这些功能一般是内嵌在应用程序中，在微服务框架下，继续使用内嵌的方式会造成非常高的管理和发布成本，因此我们需要一个抽象出一个统一的出入口完成这些功能，这就是API Gateway。我调研了几种市面上常见的API Gateway，简单分析了它们的技术特点和适用的场景。</p>
+<a id="more"></a>
 <h6 id="1-Kong"><a href="#1-Kong" class="headerlink" title="1. Kong"></a>1. Kong</h6><p>&emsp;&emsp;Kong是一个开源的，通过lua-nginx-module实现，在Nginx中运行的Lua应用程序。KONG没有使用lua-nginx-module直接编译Nginx，而是基于OpenResty，与已经包含了lua-nginx-module的OpenResty一起分发，支持Cassandra和PostgreSQL。从设计之初就考虑到了微服务的特性，对于微服务系统适应性最好。Kong支持用户个性化的定制使用插件来满足不同用户的需求。Kong有以下几个特点：</p>
 <ul>
 <li>nginx常用功能功能rest-api化，降低使用难度，便于二次开发</li>
