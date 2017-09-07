@@ -555,8 +555,7 @@
 
       
         
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>前段时间研究了一些关于jenkins的安装、部署和配置，这次结合gitlab将SaaS教科书中的RottenPotatoes示例网站进行自动化CI/CD的部署。</p>
+          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>前段时间研究了一些关于jenkins的安装、部署和配置，这次结合gitlab将SaaS教科书中的RottenPotatoes示例网站进行自动化CI/CD的部署。</p>
 <h1 id="部署环境"><a href="#部署环境" class="headerlink" title="部署环境"></a>部署环境</h1><ul>
 <li>操作系统：Ubuntu 16.04</li>
 <li>Jenkins：2.60.3</li>
@@ -565,58 +564,13 @@
 <li>Tomcat：8.55</li>
 <li>Ruby：2.3.3</li>
 </ul>
-<p>首先在ubuntu上配置ruby on rails环境，先执行如下命令安装：</p>
-<pre><code>apt install -y curl bison build-essential zlib1g-dev libssl-dev libreadline5-dev libxml2-dev git-core nodejs
-</code></pre><p>接着进入jenkins用户下安装ruby：</p>
-<pre><code>su - jenkins
-curl -L https://get.rvm.io | bash -s stable --ruby=2.3.3
-echo &apos;source &quot;/var/lib/jenkins/.rvm/scripts/rvm&quot;&apos; &gt;&gt;        /var/lib/jenkins/.bashrc
-
-source ~/.bashrc
-rvm install 2.3.3
-gem install bundler
-</code></pre><p>这样我们需要的ruby、rvm、bundler都安装好了。安装过程中如果有提示jenkins不在sudoers中，需要去/etc/sudoers中修改jenkins的权限为ALL。</p>
-<p>接下来安装postgre数据库：</p>
-<pre><code>apt-get install -y libpq-dev postgresql postgresql-client
-</code></pre><p>设置用户名、密码：</p>
-<pre><code>sudo -u postgres psql -c &quot;ALTER USER postgres PASSWORD&apos;password&apos;;&quot;
-</code></pre><p>关于如何安装及配置jenkins，之前的博客已经写过，此处不再赘述。下面重点讲一下jenkins与gitlab的webhook的配置。</p>
-<h2 id="配置SSH"><a href="#配置SSH" class="headerlink" title="配置SSH"></a>配置SSH</h2><p>首先需要在jenkins和gitlab上配置ssh。在机器上进入jenkins账号</p>
-<pre><code>su - jenkins
-</code></pre><p>然后进入jenkins的.ssh目录，ubuntu16.04下是 /var/lib/jenkins/.ssh(若.ssh文件夹不存在则用mkdir新建)，然后运行命令ssh-keygen,一路空格下去就行了。接着使用命令：</p>
-<pre><code>cat id_rsa.pub
-</code></pre><p>复制公钥，接着在Gitlab -&gt; User settings -&gt; SSH keys中添加公钥。</p>
-<h2 id="配置webhook"><a href="#配置webhook" class="headerlink" title="配置webhook"></a>配置webhook</h2><p>首先新建一个job，选择构建一个free-style项目，然后对项目进行配置，设置好gitlab仓库的地址与ssh。</p>
-<p><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/jenkins_jobs.png" alt="Job"></p>
-<p>配置jenkins与gitlab的webhook，勾选如下选项，并复制jenkins项目的项目地址：</p>
-<p><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/webhook_jenkins.png" alt="webhook_jenkins"></p>
-<p>接着在Gitlab上添加一个webhook，进入项目的settings -&gt; integration -&gt; add webhook, 然后输入刚才在jenkins得到的地址链接：</p>
-<p><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/webhook_gitlab.png" alt="webhook_gitlab"></p>
-<p>点击test进行测试，查看返回结果是否正常,若返回HTTP状态码为200，表示webhook配置成功。</p>
-<p>配置过程中也发现了一些问题，目前jenkins更新很快，有些插件很久没有更新，导致发生一些错误。比如说Gitlab hook plugin给的hook url为</p>
-<pre><code>http://youip:yourport/project/yourproject
-</code></pre><p>但是实际上新版本的jenkins已将项目路径更名为</p>
-<pre><code>http://youip:yourport/job/yourproject
-</code></pre><p>如果还使用原先的url会导致404错误。</p>
-<p>还有，webhook可能会返回403错误，查看错误日志，发现这是由于jenkins拒绝匿名（anonymous）访问，没有授权成功导致的。我们需要将gitlab中webhook url的格式改为</p>
-<pre><code>http://username:user-api-token@gitlab-path/job/yourproject
-</code></pre><p>其中username与user-api-token可以在jenkins-&gt;系统设置-&gt;管理用户-&gt;设置中找到，如图：</p>
-<p><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/jenkins-user-apitoken.png" alt="jenkins_api"></p>
-<p>这样webhook就配置好了，当开发者向gitlab push代码时，jenkins会将更新代码fetch到本地的workspace目录下。</p>
-<p>在实际的应用中，我们使用每次push都让jenkins构建一次照成的成本太高，因此我在jenkins中设置的是周期性地检查代码是否有更新，如果有更新就将最新代码下载下来并进行构建和部署。我们在jenkins的项目设置中，将poll scm一栏打勾，并在下面的文本框中写上 </p>
-<pre><code>H/5 * * * *
-</code></pre><p>表示每五分钟进行一次更新检查，这个数值可以根据项目需要更新的频率自行设置。</p>
-<h1 id="项目配置"><a href="#项目配置" class="headerlink" title="项目配置"></a>项目配置</h1><p>接下来为项目配置ruby的运行环境。首先在jenkins的根目录下维护一个文件ci_dababase.yml，每次配置时将数据库的配置文件都写入项目目录，如果对于数据库有修改，只需要修改配置文件即可，如果没有修改，cp操作花费的成本也比较低。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"># ~/ci_database.yml</div><div class="line"></div><div class="line">dafault: &amp;default</div><div class="line">  host: localhost</div><div class="line">  adapter: postresql</div><div class="line">  encoding: unicode</div><div class="line">  pool: 5</div><div class="line">  </div><div class="line">test:</div><div class="line">  &lt;&lt;: *default</div><div class="line">  database: jenkins_test</div><div class="line">  username: postgres</div><div class="line">  password: password</div><div class="line">  </div><div class="line">development: </div><div class="line">  &lt;&lt;: *default</div><div class="line">  database: jenkins_dev</div><div class="line">  username: postgres</div><div class="line">  password：password</div></pre></td></tr></table></figure>
-<p>接着进入项目配置界面，在 构建 一栏中，增加一个构建步骤，选择Execute Shell，输入以下shell脚本：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">export RAILS_ENV=development</div><div class="line">source $HOME/.bashrc</div><div class="line"></div><div class="line"># cd .  </div><div class="line"># Force RVM to load the correct Ruby version</div><div class="line"></div><div class="line"></div><div class="line">cd rottenpotatoes-rails-intro</div><div class="line">#进入项目目录</div><div class="line"></div><div class="line">bundle install</div><div class="line"></div><div class="line">cp ~/ci_database.yml ./config/database.yml     </div><div class="line"># 将之前写好的数据库配置yml文件拷贝到当前项目中</div><div class="line"></div><div class="line">bundle exec rake db:setup</div><div class="line"># 初始化数据库</div><div class="line"></div><div class="line">bundle exec rake test           </div><div class="line"># 运行测试，可以选择使用的minitest或者RSpec</div><div class="line"></div><div class="line">rails s</div><div class="line">#启动服务器，默认地址为http://localhost:3000</div></pre></td></tr></table></figure>
-<p>上面这段shell脚本可以让jenkins检测到更新的时候将最新代码自动下载、部署到本地服务器上，项目的构建脚本可以根据实际需求灵活编写，更推荐的方式是在项目中维护一个脚本文件，这里只要写两行shell命令让jenkins去执行项目中的脚本就可以了。查看jenkins的部署日志，打开rails默认端口，可以看到网站已经成功部署到本地服务器上了:</p>
-<p><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/jenkins_log.png" alt="jenkins_log"></p>
-<p><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/rottenporatoes.png" alt="jenkins_rp"></p>
-<p>但是目前还有一个小问题，就是构建之后要保持rottenpotatoes网站的运行需要jenkins的控制台在后台持续运行，导致jenkins的构建过程无法结束，理想的情况应该是jenkins指定tomcat或者其他什么代理进行网站的运行，后面还需要调研一下方法。</p>
-<p>部署成功之后，我准备研究一下jenkins插件中对于ruby的代码风格、程序框架以及一些测试的功能如rspec等有没有一些后续支持的插件。</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/09/06/Jenkins-Github进行RottenPotatoes网站的自动化CI-CD/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
