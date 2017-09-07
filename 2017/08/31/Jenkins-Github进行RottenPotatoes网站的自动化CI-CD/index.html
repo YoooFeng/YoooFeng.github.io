@@ -94,16 +94,24 @@
 
 
 
-<meta name="description" content="Interesting.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="YF的博客">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="前言前段时间研究了一些关于jenkins的安装、部署和配置，这次结合gitlab将SaaS教科书中的RottenPotatoes示例网站进行自动化CI/CD的部署。 部署环境 操作系统：Ubuntu 16.04 Jenkins：2.60.3 Gitlab： Git：2.7.4 Tomcat：8.55 Ruby：2.3.3  首先在ubuntu上配置ruby on rails环境，先执行如下命令安装">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jenkins+Github进行RottenPotatoes网站的自动化CI&#x2F;CD">
+<meta property="og:url" content="http://yoursite.com/2017/08/31/Jenkins-Github进行RottenPotatoes网站的自动化CI-CD/index.html">
 <meta property="og:site_name" content="YF的博客">
-<meta property="og:description" content="Interesting.">
+<meta property="og:description" content="前言前段时间研究了一些关于jenkins的安装、部署和配置，这次结合gitlab将SaaS教科书中的RottenPotatoes示例网站进行自动化CI/CD的部署。 部署环境 操作系统：Ubuntu 16.04 Jenkins：2.60.3 Gitlab： Git：2.7.4 Tomcat：8.55 Ruby：2.3.3  首先在ubuntu上配置ruby on rails环境，先执行如下命令安装">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/jenkins_jobs.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/webhook_jenkins.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/webhook_gitlab.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/jenkins-user-apitoken.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/jenkins_log.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/rottenporatoes.png">
+<meta property="og:updated_time" content="2017-09-07T02:54:02.754Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="YF的博客">
-<meta name="twitter:description" content="Interesting.">
+<meta name="twitter:title" content="Jenkins+Github进行RottenPotatoes网站的自动化CI&#x2F;CD">
+<meta name="twitter:description" content="前言前段时间研究了一些关于jenkins的安装、部署和配置，这次结合gitlab将SaaS教科书中的RottenPotatoes示例网站进行自动化CI/CD的部署。 部署环境 操作系统：Ubuntu 16.04 Jenkins：2.60.3 Gitlab： Git：2.7.4 Tomcat：8.55 Ruby：2.3.3  首先在ubuntu上配置ruby on rails环境，先执行如下命令安装">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/jenkins_jobs.png">
 
 
 
@@ -133,13 +141,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/08/31/Jenkins-Github进行RottenPotatoes网站的自动化CI-CD/"/>
 
 
 
 
 
-  <title>YF的博客</title>
+  <title>Jenkins+Github进行RottenPotatoes网站的自动化CI/CD | YF的博客</title>
   
 
 
@@ -158,9 +166,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-   page-home 
- ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -263,172 +269,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/18/welcome/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="YoooFeng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="YF的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/08/18/welcome/" itemprop="url">欢迎来访</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-18T16:17:43+08:00">
-                2017-08-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/置顶/" itemprop="url" rel="index">
-                    <span itemprop="name">置顶</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/08/18/welcome/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/08/18/welcome/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/08/18/welcome/" class="leancloud_visitors" data-flag-title="欢迎来访">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="学习，分享，纪念。"><a href="#学习，分享，纪念。" class="headerlink" title="学习，分享，纪念。"></a>学习，分享，纪念。</h2>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
 
   
 
@@ -458,9 +301,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/08/31/Jenkins-Github进行RottenPotatoes网站的自动化CI-CD/" itemprop="url">Jenkins+Github进行RottenPotatoes网站的自动化CI/CD</a></h1>
+          <h1 class="post-title" itemprop="name headline">Jenkins+Github进行RottenPotatoes网站的自动化CI/CD</h1>
         
 
         <div class="post-meta">
@@ -532,9 +373,7 @@
       
 
       
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>前段时间研究了一些关于jenkins的安装、部署和配置，这次结合gitlab将SaaS教科书中的RottenPotatoes示例网站进行自动化CI/CD的部署。</p>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>前段时间研究了一些关于jenkins的安装、部署和配置，这次结合gitlab将SaaS教科书中的RottenPotatoes示例网站进行自动化CI/CD的部署。</p>
 <h1 id="部署环境"><a href="#部署环境" class="headerlink" title="部署环境"></a>部署环境</h1><ul>
 <li>操作系统：Ubuntu 16.04</li>
 <li>Jenkins：2.60.3</li>
@@ -594,8 +433,6 @@ gem install bundler
 <p>但是目前还有一个小问题，就是构建之后要保持rottenpotatoes网站的运行需要jenkins的控制台在后台持续运行，导致jenkins的构建过程无法结束，理想的情况应该是jenkins指定tomcat或者其他什么代理进行网站的运行，后面还需要调研一下方法。</p>
 <p>部署成功之后，我准备研究一下jenkins插件中对于ruby的代码风格、程序框架以及一些测试的功能如rspec等有没有一些后续支持的插件。</p>
 
-          
-        
       
     </div>
     
@@ -612,180 +449,28 @@ gem install bundler
       
 
       
-
-      
-
       
       
-        <div class="post-eof"></div>
+
       
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/22/常用API-Gateway简介/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="YoooFeng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="YF的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/08/22/常用API-Gateway简介/" itemprop="url">常用API Gateway简介</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-22T16:38:32+08:00">
-                2017-08-22
-              </time>
+              <a href="/2017/08/22/常用API-Gateway简介/" rel="next" title="常用API Gateway简介">
+                <i class="fa fa-chevron-left"></i> 常用API Gateway简介
+              </a>
             
+          </div>
 
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
             
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/技术相关/" itemprop="url" rel="index">
-                    <span itemprop="name">技术相关</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/08/22/常用API-Gateway简介/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/08/22/常用API-Gateway简介/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/08/22/常用API-Gateway简介/" class="leancloud_visitors" data-flag-title="常用API Gateway简介">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
+          </div>
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          <h1 id="初衷"><a href="#初衷" class="headerlink" title="初衷"></a>初衷</h1><p>&emsp;&emsp;API Gateway是与微服务（MicroService）这个概念一同兴起的一种架构，用于解决微服务过于分散，没有统一出入口进行流量管理的问题。当一个大的应用拆分成一个个微服务时，不同的微服务具有不同的职责，但是它们会有一些通用的功能如授权、流量监控和控制、日志统计等，在传统的单体应用中，这些功能一般是内嵌在应用程序中，在微服务框架下，继续使用内嵌的方式会造成非常高的管理和发布成本，因此我们需要一个抽象出一个统一的出入口完成这些功能，这就是API Gateway。我调研了几种市面上常见的API Gateway，简单分析了它们的技术特点和适用的场景。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/08/22/常用API-Gateway简介/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -795,10 +480,37 @@ gem install bundler
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微薄</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
 
 
           </div>
@@ -806,6 +518,17 @@ gem install bundler
 
 
           
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
 
         </div>
         
@@ -826,8 +549,17 @@ gem install bundler
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.gif"
@@ -889,6 +621,22 @@ gem install bundler
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署环境"><span class="nav-number">2.</span> <span class="nav-text">部署环境</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置SSH"><span class="nav-number">2.1.</span> <span class="nav-text">配置SSH</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置webhook"><span class="nav-number">2.2.</span> <span class="nav-text">配置webhook</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#项目配置"><span class="nav-number">3.</span> <span class="nav-text">项目配置</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -1012,10 +760,10 @@ gem install bundler
 
 
   
-    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
 
-  
+
 
   
 
@@ -1033,6 +781,18 @@ gem install bundler
       <script id="dsq-count-scr" src="https://YF.disqus.com/count.js" async></script>
     
 
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/08/31/Jenkins-Github进行RottenPotatoes网站的自动化CI-CD/';
+          this.page.identifier = '2017/08/31/Jenkins-Github进行RottenPotatoes网站的自动化CI-CD/';
+          this.page.title = 'Jenkins+Github进行RottenPotatoes网站的自动化CI/CD';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://YF.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
     
 
   
