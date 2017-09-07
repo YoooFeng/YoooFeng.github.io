@@ -55,16 +55,16 @@ tags:
 ## 配置webhook  
 首先新建一个job，选择构建一个free-style项目，然后对项目进行配置，设置好gitlab仓库的地址与ssh。
 	
-    （图片）
-    （图片）
+![Job](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/jenkins_jobs.png)
+
     
 配置jenkins与gitlab的webhook，勾选如下选项，并复制jenkins项目的项目地址：
 	
-    （图片）
+![webhook_jenkins](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/webhook_jenkins.png)
     
 接着在Gitlab上添加一个webhook，进入项目的settings -> integration -> add webhook, 然后输入刚才在jenkins得到的地址链接：
 
-	（图片webhook_gitlab）
+![webhook_gitlab](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/webhook_github.PNG)
     
 点击test进行测试，查看返回结果是否正常：
 
@@ -160,4 +160,3 @@ rails s
 
 
 部署成功之后，我准备研究一下jenkins插件中对于ruby的代码风格、程序框架以及一些测试的功能如rspec等有没有一些后续支持的插件。
-
