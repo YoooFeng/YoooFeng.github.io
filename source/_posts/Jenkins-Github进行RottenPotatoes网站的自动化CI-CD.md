@@ -1,7 +1,8 @@
 title: Jenkins+Github进行RottenPotatoes网站的自动化CI/CD
 author: YoooFeng
-date: 2017-08-31 15:57:58
-tags:
+date: 2017-09-06 15:57:58
+categories: 技术相关
+tags: [jenkins, CI&CD]
 ---
 # 前言
 前段时间研究了一些关于jenkins的安装、部署和配置，这次结合gitlab将SaaS教科书中的RottenPotatoes示例网站进行自动化CI/CD的部署。
@@ -9,11 +10,12 @@ tags:
 # 部署环境
 + 操作系统：Ubuntu 16.04
 + Jenkins：2.60.3
-+ Gitlab：
++ Gitlab：9.5.2
 + Git：2.7.4
 + Tomcat：8.55
-+ Ruby：2.3.3
++ Ruby：2.3.0
 
+<!-- more -->
 首先在ubuntu上配置ruby on rails环境，先执行如下命令安装：
 
 	apt install -y curl bison build-essential zlib1g-dev libssl-dev libreadline5-dev libxml2-dev git-core nodejs
@@ -21,11 +23,11 @@ tags:
 接着进入jenkins用户下安装ruby：
 	
     su - jenkins
-    curl -L https://get.rvm.io | bash -s stable --ruby=2.3.3
+    curl -L https://get.rvm.io | bash -s stable --ruby=2.3.0
     echo 'source "/var/lib/jenkins/.rvm/scripts/rvm"' >>        /var/lib/jenkins/.bashrc
     
     source ~/.bashrc
-    rvm install 2.3.3
+    rvm install 2.3.0
     gem install bundler
     
 这样我们需要的ruby、rvm、bundler都安装好了。安装过程中如果有提示jenkins不在sudoers中，需要去/etc/sudoers中修改jenkins的权限为ALL。
@@ -64,11 +66,9 @@ tags:
     
 接着在Gitlab上添加一个webhook，进入项目的settings -> integration -> add webhook, 然后输入刚才在jenkins得到的地址链接：
 
-![webhook_gitlab](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/webhook_github.PNG)
+![webhook_gitlab](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/webhook_gitlab.png)
     
-点击test进行测试，查看返回结果是否正常：
-
-	（图片webhook_gitlab_test）
+点击test进行测试，查看返回结果是否正常,若返回HTTP状态码为200，表示webhook配置成功。
     
 配置过程中也发现了一些问题，目前jenkins更新很快，有些插件很久没有更新，导致发生一些错误。比如说Gitlab hook plugin给的hook url为
 	
@@ -86,7 +86,7 @@ tags:
     
 其中username与user-api-token可以在jenkins->系统设置->管理用户->设置中找到，如图：
 	
-    (图片jenkins-user-api)
+![jenkins_api](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/jenkins-user-apitoken.png)
   
 这样webhook就配置好了，当开发者向gitlab push代码时，jenkins会将更新代码fetch到本地的workspace目录下。
 
@@ -152,8 +152,9 @@ rails s
 
 上面这段shell脚本可以让jenkins检测到更新的时候将最新代码自动下载、部署到本地服务器上，项目的构建脚本可以根据实际需求灵活编写，更推荐的方式是在项目中维护一个脚本文件，这里只要写两行shell命令让jenkins去执行项目中的脚本就可以了。查看jenkins的部署日志，打开rails默认端口，可以看到网站已经成功部署到本地服务器上了:
 
-	(图片 日志)
-    (图片 网站)
+![jenkins_log](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/jenkins_log.png)
+
+![jenkins_rp](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/Jenkins_rp.pic/rottenporatoes.png)
     
 但是目前还有一个小问题，就是构建之后要保持rottenpotatoes网站的运行需要jenkins的控制台在后台持续运行，导致jenkins的构建过程无法结束，理想的情况应该是jenkins指定tomcat或者其他什么代理进行网站的运行，后面还需要调研一下方法。
 
