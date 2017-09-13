@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="jenkins,CI&CD,passenger,apache," />
+  <meta name="keywords" content="jenkins,doclinks,测试," />
 
 
 
@@ -94,21 +94,24 @@
 
 
 
-<meta name="description" content="简述上周提到使用jenkins部署rottenpotatoes项目，直接运用jenkins运行网站导致构建过程无法结束。为了解决这个问题，我在网上调研了一些解决方案，一种解决方案是，利用warbler工具，将烂土豆网站打包成war包，再放入tomcat中执行。但是warbler需要用JRuby环境，而且需要配置数据库连接等，配置比较复杂，另一种解决方案是使用phusion-passenger，下文">
-<meta name="keywords" content="jenkins,CI&amp;CD,passenger,apache">
+<meta name="description" content="Jenkins中ROR插件调研把rottenpotatoes网站部署好之后，还需要对提交的代码进行一系列测试和处理，比如是否符合TDD、BDD的开发准则，测试覆盖度是否达到标准，代码风格是否符合规范等等，这需要一系列的工具或插件来支撑。目前具体的需求还不是很清楚，我对jenkins上对ROR项目进行支撑的插件进行了一些调研，并且提出了一个简单的解决方案。">
+<meta name="keywords" content="jenkins,doclinks,测试">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Passenger + Apache2帮助jenkins进行持续集成和部署">
-<meta property="og:url" content="http://yoursite.com/2017/09/13/Passenger-Apache2帮助jenkins进行持续集成和部署/index.html">
+<meta property="og:title" content="使用DocLinks插件展示ROR项目测试结果">
+<meta property="og:url" content="http://yoursite.com/2017/09/14/使用DocLinks插件展示ROR项目测试结果/index.html">
 <meta property="og:site_name" content="YF的博客">
-<meta property="og:description" content="简述上周提到使用jenkins部署rottenpotatoes项目，直接运用jenkins运行网站导致构建过程无法结束。为了解决这个问题，我在网上调研了一些解决方案，一种解决方案是，利用warbler工具，将烂土豆网站打包成war包，再放入tomcat中执行。但是warbler需要用JRuby环境，而且需要配置数据库连接等，配置比较复杂，另一种解决方案是使用phusion-passenger，下文">
+<meta property="og:description" content="Jenkins中ROR插件调研把rottenpotatoes网站部署好之后，还需要对提交的代码进行一系列测试和处理，比如是否符合TDD、BDD的开发准则，测试覆盖度是否达到标准，代码风格是否符合规范等等，这需要一系列的工具或插件来支撑。目前具体的需求还不是很清楚，我对jenkins上对ROR项目进行支撑的插件进行了一些调研，并且提出了一个简单的解决方案。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/passenger_apache.pic/passenger_jenkins_log.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/passenger_apache.pic/passenger_jenkins_rp.png">
-<meta property="og:updated_time" content="2017-09-11T09:20:39.355Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/add_Rcov.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/setting_doclinks.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/rcov_console.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/jenkins_project.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/rcov_detail.png">
+<meta property="og:updated_time" content="2017-09-13T06:31:32.123Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Passenger + Apache2帮助jenkins进行持续集成和部署">
-<meta name="twitter:description" content="简述上周提到使用jenkins部署rottenpotatoes项目，直接运用jenkins运行网站导致构建过程无法结束。为了解决这个问题，我在网上调研了一些解决方案，一种解决方案是，利用warbler工具，将烂土豆网站打包成war包，再放入tomcat中执行。但是warbler需要用JRuby环境，而且需要配置数据库连接等，配置比较复杂，另一种解决方案是使用phusion-passenger，下文">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/passenger_apache.pic/passenger_jenkins_log.png">
+<meta name="twitter:title" content="使用DocLinks插件展示ROR项目测试结果">
+<meta name="twitter:description" content="Jenkins中ROR插件调研把rottenpotatoes网站部署好之后，还需要对提交的代码进行一系列测试和处理，比如是否符合TDD、BDD的开发准则，测试覆盖度是否达到标准，代码风格是否符合规范等等，这需要一系列的工具或插件来支撑。目前具体的需求还不是很清楚，我对jenkins上对ROR项目进行支撑的插件进行了一些调研，并且提出了一个简单的解决方案。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/add_Rcov.png">
 
 
 
@@ -138,13 +141,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/09/13/Passenger-Apache2帮助jenkins进行持续集成和部署/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/09/14/使用DocLinks插件展示ROR项目测试结果/"/>
 
 
 
 
 
-  <title>Passenger + Apache2帮助jenkins进行持续集成和部署 | YF的博客</title>
+  <title>使用DocLinks插件展示ROR项目测试结果 | YF的博客</title>
   
 
 
@@ -281,7 +284,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/13/Passenger-Apache2帮助jenkins进行持续集成和部署/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/14/使用DocLinks插件展示ROR项目测试结果/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="YoooFeng">
@@ -298,7 +301,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Passenger + Apache2帮助jenkins进行持续集成和部署</h1>
+          <h1 class="post-title" itemprop="name headline">使用DocLinks插件展示ROR项目测试结果</h1>
         
 
         <div class="post-meta">
@@ -310,8 +313,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-13T17:05:39+08:00">
-                2017-09-13
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-14T14:11:28+08:00">
+                2017-09-14
               </time>
             
 
@@ -351,9 +354,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/09/13/Passenger-Apache2帮助jenkins进行持续集成和部署/#comments" itemprop="discussionUrl">
+                <a href="/2017/09/14/使用DocLinks插件展示ROR项目测试结果/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/09/13/Passenger-Apache2帮助jenkins进行持续集成和部署/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2017/09/14/使用DocLinks插件展示ROR项目测试结果/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -361,7 +364,7 @@
 
           
           
-             <span id="/2017/09/13/Passenger-Apache2帮助jenkins进行持续集成和部署/" class="leancloud_visitors" data-flag-title="Passenger + Apache2帮助jenkins进行持续集成和部署">
+             <span id="/2017/09/14/使用DocLinks插件展示ROR项目测试结果/" class="leancloud_visitors" data-flag-title="使用DocLinks插件展示ROR项目测试结果">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -392,31 +395,48 @@
       
 
       
-        <h1 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h1><p>上周提到使用jenkins部署rottenpotatoes项目，直接运用jenkins运行网站导致构建过程无法结束。为了解决这个问题，我在网上调研了一些解决方案，一种解决方案是，利用warbler工具，将烂土豆网站打包成war包，再放入tomcat中执行。但是warbler需要用JRuby环境，而且需要配置数据库连接等，配置比较复杂，另一种解决方案是使用phusion-passenger，下文我们使用的就是这种方案。<br>PhusionPassenger是一个开源的轻量化部署工具，可以跟nginx、apache等集成，使用passenger后，只需要进行一些配置，网站就可以直接使用nginx或者apache部署。<br><a id="more"></a></p>
-<h1 id="Passenger-Apache2的安装和配置"><a href="#Passenger-Apache2的安装和配置" class="headerlink" title="Passenger + Apache2的安装和配置"></a>Passenger + Apache2的安装和配置</h1><p>系统中已经有了ruby、rails等环境，接下来主要讲一下passenger的安装：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"># 安装依赖软件</div><div class="line">sudo apt-get install -y dirmngr gnupg</div><div class="line">sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7</div><div class="line">sudo apt-get install -y apt-transport-https ca-certificates</div><div class="line"></div><div class="line"># 添加APT repository</div><div class="line">sudo sh -c &apos;echo deb https://oss-binaries.phusionpassenger.com/apt/passenger xenial main &gt; /etc/apt/sources.list.d/passenger.list&apos;</div><div class="line"></div><div class="line">sudo apt-get update</div><div class="line"></div><div class="line"># 安装 Passenger + Apache2</div><div class="line">sudo apt-get install -y apache2-dev</div><div class="line">sudo apt-get install -y libapache2-mod-passenger</div></pre></td></tr></table></figure></p>
-<p>安装完成后启用passenger插件：</p>
-<pre><code>sudo a2enmod passenger
-sudo apache2ctl restart
-</code></pre><p>重启apache服务，使用命令查看安装是否成功：</p>
-<pre><code>sudo service apache restart
-sudo /usr/bin/passenger-config validate-install
-sudo /usr/sbin/passenger-memory-stats
-</code></pre><p>安装成功后，利用passenger对网站进行部署。假设电脑中安装了多个版本的ruby，先要查看passenger使用的是哪个版本的ruby:</p>
-<pre><code>passenger-config about ruby-command
-</code></pre><p>如果ruby版本不符，使用 rvm use x.x.x 指定使用的ruby版本。</p>
-<p>接下来在/etc/apache2/sites-enabled/中新建一个项目的配置文件yourapp.conf，其中yourapp用项目名代替：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">&lt;VirtualHost *:80&gt;</div><div class="line">    ServerName yourserver.com</div><div class="line"></div><div class="line">    # Tell Apache and Passenger where your app&apos;s &apos;public&apos; directory is</div><div class="line">    DocumentRoot /var/www/myapp/code/public</div><div class="line"></div><div class="line">    PassengerRuby /path-to-ruby</div><div class="line"></div><div class="line">    # Relax Apache security settings</div><div class="line">    &lt;Directory /var/www/myapp/code/public&gt;</div><div class="line">      Allow from all</div><div class="line">      Options -MultiViews</div><div class="line">      # Uncomment this if you&apos;re on Apache &gt;= 2.4:</div><div class="line">      Require all granted</div><div class="line">      Options FollowSymLinks</div><div class="line">      AllowOverride None</div><div class="line">    &lt;/Directory&gt;</div><div class="line">&lt;/VirtualHost&gt;</div></pre></td></tr></table></figure>
-<p>依次将文件中的ServerName改为本机的IP地址、DocumentRoot指向项目的public文件夹、PassengerRuby指向jenkins下的ruby-2.3.0文件夹、Directory也改成项目的public文件夹。配置完成后重启apache服务，访问<a href="http://localhost:80" target="_blank" rel="external">http://localhost:80</a> 出现网站界面后，说明部署成功。</p>
-<h1 id="网站有更新时自动应用更新"><a href="#网站有更新时自动应用更新" class="headerlink" title="网站有更新时自动应用更新"></a>网站有更新时自动应用更新</h1><p>我们搭建的jenkins+gitlab CI&amp;CD平台，当jenkins检测到gitlab仓库中的项目有更新时，会自动将更新后的代码下载到本地workspace文件夹中，我们用apache运行的就是workspace文件夹中的网站。当jenkins将更新后的代码下载下来后，passenger和apache运行的还是旧版本的网站，那么如何自动更新呢？</p>
-<p>我们直接使用Passenger提供的app-restart命令：</p>
-<pre><code>passenger-config restart-app $(pwd)
-</code></pre><p>每次jenkins从gitlab上下载最新的代码时，在jenkins的构建后执行的shell脚本中加入passenger的重启命令即可。</p>
-<p>我们还需要对原先的ci_database.yml文件进行一些修改，在文件末尾将production环境加入：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">#~/ci_database.yml</div><div class="line"></div><div class="line">.......</div><div class="line"></div><div class="line">production: </div><div class="line">  &lt;&lt;: *default</div><div class="line">  database: jenkins_pro</div><div class="line">  username: postgres</div><div class="line">  password: password</div></pre></td></tr></table></figure>
-<p> 原本jenkins中设置的构建脚本更新为：</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"> #!/bin/bash</div><div class="line">export RAILS_ENV=development</div><div class="line">source $HOME/.bashrc</div><div class="line">cd .  </div><div class="line"># Force RVM to load the correct Ruby version</div><div class="line"></div><div class="line">bundle install</div><div class="line"></div><div class="line">cp ~/ci_database.yml ./config/database.yml     </div><div class="line"># 将之前写好的数据库配置yml文件拷贝到当前项目中</div><div class="line">bundle exec rake db:setup</div><div class="line"></div><div class="line">bundle exec rake assets:precompile db:migrate RAILS_ENV=production</div><div class="line"># 初始化数据库</div><div class="line"></div><div class="line">passenger-config restart-app $(pwd)</div><div class="line">#passenger提供的更新网站的命令</div><div class="line"></div><div class="line"># bundle exec rake test           </div><div class="line"># 运行测试，可以选择使用的minitest或者RSpec</div><div class="line"># rails s </div><div class="line">#启动服务器，默认地址为http://localhost:3000</div></pre></td></tr></table></figure>
-<p>这样配置之后，网站的运行就不需要jenkins的命令行后台持续运行，不会导致jenkins任务构建不成功了。部署后的实际效果如下图所示：<br><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/passenger_apache.pic/passenger_jenkins_log.png" alt="log"></p>
-<p><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/passenger_apache.pic/passenger_jenkins_rp.png" alt="rp"></p>
+        <h1 id="Jenkins中ROR插件调研"><a href="#Jenkins中ROR插件调研" class="headerlink" title="Jenkins中ROR插件调研"></a>Jenkins中ROR插件调研</h1><p>把rottenpotatoes网站部署好之后，还需要对提交的代码进行一系列测试和处理，比如是否符合TDD、BDD的开发准则，测试覆盖度是否达到标准，代码风格是否符合规范等等，这需要一系列的工具或插件来支撑。目前具体的需求还不是很清楚，我对jenkins上对ROR项目进行支撑的插件进行了一些调研，并且提出了一个简单的解决方案。</p>
+<a id="more"></a>
+<h2 id="Ruby-Plugin"><a href="#Ruby-Plugin" class="headerlink" title="Ruby Plugin"></a>Ruby Plugin</h2><p>这个插件的工作原理类似于Shell builder，在下图中输入你想要运行的ruby脚本，系统默认的ruby编译器就会去执行文本框中的ruby脚本代码。</p>
+<h2 id="RubyMetrics-plugin"><a href="#RubyMetrics-plugin" class="headerlink" title="*RubyMetrics plugin"></a>*RubyMetrics plugin</h2><p>一个分析ruby代码的工具，支持分析Rcov – Code Coverage for Ruby，并且可以将分析的结果自动生成图表展示。举例来说，只需要使用命令Rspec,所有的测试就会自动进行，测试的覆盖率也一并计算，最后生成的是一些图片和表格，对整个测试的情况进行总结。</p>
+<p>我们首先在jenkins插件中心安装RubyMetrcs Plugin插件，要使用插件，我们在项目配置中进行设置。<br>进入“构建后操作”这一栏，点击“增加构建后操作步骤”，选择“Publish Rcov report”，出现如下界面：</p>
+<p><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/add_Rcov.png" alt="rcov"></p>
+<p>然后我们只需要设置好生成Rcov报告的目录，以及各项指标的的阈值，在项目完成构建后，就会在我们指定的目录生成Rcov Report。除此之外，我们还需要修改一下项目的Gemfile和spec/spec_helper.rb。<br>我们在Gemfile中加入以下代码：</p>
+<pre><code># Gemfile
+gem &apos;simplecov&apos;, :require =&gt; false, :group =&gt; :test
+gem &apos;simplecov-rcov&apos;
+</code></pre><p>在spec_helper.rb中在文件开头加入以下代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"># spec_helper.rb</div><div class="line">require &apos;simplecov&apos;</div><div class="line">require &apos;simplecov-rcov&apos;</div><div class="line">SimpleCov.formatter = SimpleCov::Formatter::RcovFormatter</div><div class="line">SimpleCov.start &apos;rails&apos;</div></pre></td></tr></table></figure>
+<p>RottenPotatoes似乎没有写单元测试的测试用例，rspec无法进行，因此当jenkins执行构建时会显示rcov report index file wasn’t found. Google了一下没有找到解决方案，后面可能需要手动加入几个测试用例。</p>
+<h2 id="Cucumber-report-plugin"><a href="#Cucumber-report-plugin" class="headerlink" title="Cucumber-report-plugin"></a>Cucumber-report-plugin</h2><p>一个测试项目代码是否符合Behavioral Driven Design的插件，可以自动生成HTML形式的测试结果，但是目前该插件集成的是cucumber的java实现版本cucumber-jvm。</p>
+<h2 id="Junit-Plugin"><a href="#Junit-Plugin" class="headerlink" title="Junit Plugin"></a>Junit Plugin</h2><p>测试失败，项目构建不成功。</p>
+<h2 id="Brakeman-Plugin"><a href="#Brakeman-Plugin" class="headerlink" title="Brakeman Plugin"></a>Brakeman Plugin</h2><p>对ruby on rails项目进行安全检测的插件，目前无此需求。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>通过调研，最后我选择的解决方法是在命令行中利用shell代码进行rspec测试、生成Rcov报告，然后利用一个通用的jenkins插件DocLinks，将生成的报告集成到项目管理界面上。之后对rails项目进行分析和测试也可以自己选择想进行的测试工具（如cucumber等），然后在命令行中执行测试，最后只需要将结果集成到jenkins中即可。具体的配置过程如下：<br>首先在jenkins中安装Doclinks插件，这里不再详细描述。</p>
+<p>然后编辑项目目录下的Gemfile文件和spec_helper文件：</p>
+<pre><code>#Gemfile
+#Add lines
+gem ‘simplecov’, :require=&gt;false, group: :test
+gem ‘simplecov-rcov’, :require=&gt;false, group: :test
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">#spec_helper.rb</div><div class="line">#加在所有测试代码运行之前，即文件最开头</div><div class="line">require ‘simplecov’</div><div class="line">require ‘simplecov-rcov’</div><div class="line"></div><div class="line">SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter</div><div class="line">SimpleCov.start</div></pre></td></tr></table></figure>
+<p>进入jenkins的项目配置页面，在构建-&gt;Execute shell中最后加入运行rspec测试的命令：</p>
+<pre><code>rspec spec
+</code></pre><p>项目配置-&gt;构建后操作-&gt;增加构建后操作步骤，选择选项publish documents，进行如下配置：</p>
+<p><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/setting_doclinks.png" alt="doclinks"></p>
+<p>参数说明：</p>
+<ul>
+<li>Title：显示的文件名；</li>
+<li>Description：对文件的说明；</li>
+<li>Dictionary to archive：文件所在目录（simplecov默认为项目目录下的coverage文件夹）</li>
+<li>Index file：显示的主页面</li>
+</ul>
+<p>保存设置，对项目进行构建，查看控制台输出，发现SimpleCov报告已经生成了：</p>
+<p> <img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/rcov_console.png" alt="console"></p>
+<p>回到jenkins项目主页，可以直接点击查看生成的测试报告：</p>
+<p> <img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/jenkins_project.png" alt="jenkins-project"></p>
+<p>测试报告的详情：</p>
+<p> <img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/rcov_detail.png" alt="report-detail"></p>
+<p>由于rottenpotato网站的代码中没有写rspec测试代码，所以没有example成功或失败，默认显示的覆盖率为100%。</p>
+<h1 id="关于Blue-Ocean："><a href="#关于Blue-Ocean：" class="headerlink" title="关于Blue Ocean："></a>关于Blue Ocean：</h1><p>Blue Ocean目前支持的jenkins job类型只有Multibranch Pipeline job，因此我们需要新建一个此类型的项目。在创建项目时，Blue Ocean提供了一个线性的创建流程，如果我们在远程仓库中预先写好jenkinsfile，那么当项目创建时，jenkins会根据jenkinsfile自动生成pipeline流程。</p>
 
       
     </div>
@@ -436,11 +456,9 @@ sudo /usr/sbin/passenger-memory-stats
           
             <a href="/tags/jenkins/" rel="tag"># jenkins</a>
           
-            <a href="/tags/CI-CD/" rel="tag"># CI&CD</a>
+            <a href="/tags/doclinks/" rel="tag"># doclinks</a>
           
-            <a href="/tags/passenger/" rel="tag"># passenger</a>
-          
-            <a href="/tags/apache/" rel="tag"># apache</a>
+            <a href="/tags/测试/" rel="tag"># 测试</a>
           
         </div>
       
@@ -453,8 +471,8 @@ sudo /usr/sbin/passenger-memory-stats
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/09/06/Jenkins-Github进行RottenPotatoes网站的自动化CI-CD/" rel="next" title="Jenkins+Github进行RottenPotatoes网站的自动化CI/CD">
-                <i class="fa fa-chevron-left"></i> Jenkins+Github进行RottenPotatoes网站的自动化CI/CD
+              <a href="/2017/09/13/Passenger-Apache2帮助jenkins进行持续集成和部署/" rel="next" title="Passenger + Apache2帮助jenkins进行持续集成和部署">
+                <i class="fa fa-chevron-left"></i> Passenger + Apache2帮助jenkins进行持续集成和部署
               </a>
             
           </div>
@@ -462,10 +480,6 @@ sudo /usr/sbin/passenger-memory-stats
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/09/14/使用DocLinks插件展示ROR项目测试结果/" rel="prev" title="使用DocLinks插件展示ROR项目测试结果">
-                使用DocLinks插件展示ROR项目测试结果 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -632,7 +646,7 @@ var jiathis_config={
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简述"><span class="nav-number">1.</span> <span class="nav-text">简述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Passenger-Apache2的安装和配置"><span class="nav-number">2.</span> <span class="nav-text">Passenger + Apache2的安装和配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网站有更新时自动应用更新"><span class="nav-number">3.</span> <span class="nav-text">网站有更新时自动应用更新</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Jenkins中ROR插件调研"><span class="nav-number">1.</span> <span class="nav-text">Jenkins中ROR插件调研</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Ruby-Plugin"><span class="nav-number">1.1.</span> <span class="nav-text">Ruby Plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RubyMetrics-plugin"><span class="nav-number">1.2.</span> <span class="nav-text">*RubyMetrics plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cucumber-report-plugin"><span class="nav-number">1.3.</span> <span class="nav-text">Cucumber-report-plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Junit-Plugin"><span class="nav-number">1.4.</span> <span class="nav-text">Junit Plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Brakeman-Plugin"><span class="nav-number">1.5.</span> <span class="nav-text">Brakeman Plugin</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决方案"><span class="nav-number">2.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于Blue-Ocean："><span class="nav-number">3.</span> <span class="nav-text">关于Blue Ocean：</span></a></li></ol></div>
             
 
           </div>
@@ -785,9 +799,9 @@ var jiathis_config={
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2017/09/13/Passenger-Apache2帮助jenkins进行持续集成和部署/';
-          this.page.identifier = '2017/09/13/Passenger-Apache2帮助jenkins进行持续集成和部署/';
-          this.page.title = 'Passenger + Apache2帮助jenkins进行持续集成和部署';
+          this.page.url = 'http://yoursite.com/2017/09/14/使用DocLinks插件展示ROR项目测试结果/';
+          this.page.identifier = '2017/09/14/使用DocLinks插件展示ROR项目测试结果/';
+          this.page.title = '使用DocLinks插件展示ROR项目测试结果';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://YF.disqus.com/embed.js';
