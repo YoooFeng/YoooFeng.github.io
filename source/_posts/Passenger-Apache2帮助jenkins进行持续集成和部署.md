@@ -1,7 +1,8 @@
 title: Passenger + Apache2帮助jenkins进行持续集成和部署
 author: YoooFeng
-date: 2017-09-11 17:05:39
-tags:
+date: 2017-09-13 17:05:39
+categories: 技术相关
+tags: [CI&CD, jenkins, passenger, apache]
 ---
 # 简述
 
@@ -118,6 +119,8 @@ passenger-config restart-app $(pwd)
 #启动服务器，默认地址为http://localhost:3000
 ```
 这样配置之后，网站的运行就不需要jenkins的命令行后台持续运行，不会导致jenkins任务构建不成功了。部署后的实际效果如下图所示：
+![log](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/passenger_apache.pic/passenger_jenkins_log.png)
 
+![rp](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/passenger_apache.pic/passenger_jenkins_rp.png)
 
 
