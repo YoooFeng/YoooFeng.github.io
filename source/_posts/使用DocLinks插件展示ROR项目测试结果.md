@@ -1,9 +1,13 @@
 title: 使用DocLinks插件展示ROR项目测试结果
 author: YoooFeng
-date: 2017-09-13 14:11:28
-tags:
+date: 2017-09-14 14:11:28
+categories: 技术相关
+tags: [jenkins, doclinks, 测试]
 ---
 # Jenkins中ROR插件调研
+把rottenpotatoes网站部署好之后，还需要对提交的代码进行一系列测试和处理，比如是否符合TDD、BDD的开发准则，测试覆盖度是否达到标准，代码风格是否符合规范等等，这需要一系列的工具或插件来支撑。目前具体的需求还不是很清楚，我对jenkins上对ROR项目进行支撑的插件进行了一些调研，并且提出了一个简单的解决方案。
+
+<!-- more -->
 
 ## Ruby Plugin
 这个插件的工作原理类似于Shell builder，在下图中输入你想要运行的ruby脚本，系统默认的ruby编译器就会去执行文本框中的ruby脚本代码。
@@ -14,7 +18,8 @@ tags:
 
 我们首先在jenkins插件中心安装RubyMetrcs Plugin插件，要使用插件，我们在项目配置中进行设置。
 进入“构建后操作”这一栏，点击“增加构建后操作步骤”，选择“Publish Rcov report”，出现如下界面：
-（图add_Rcov）
+
+![rcov](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/add_Rcov.png)
 
 然后我们只需要设置好生成Rcov报告的目录，以及各项指标的的阈值，在项目完成构建后，就会在我们指定的目录生成Rcov Report。除此之外，我们还需要修改一下项目的Gemfile和spec/spec_helper.rb。
 我们在Gemfile中加入以下代码：
@@ -71,33 +76,29 @@ SimpleCov.start
 
 项目配置->构建后操作->增加构建后操作步骤，选择选项publish documents，进行如下配置：
 
+![doclinks](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/setting_doclinks.png)
  
 
 参数说明：
-Title：显示的文件名；
-Description：对文件的说明；
-Dictionary to archive：文件所在目录（simplecov默认为项目目录下的coverage文件夹）
-Index file：显示的主页面
++ Title：显示的文件名；
++ Description：对文件的说明；
++ Dictionary to archive：文件所在目录（simplecov默认为项目目录下的coverage文件夹）
++ Index file：显示的主页面
 
 保存设置，对项目进行构建，查看控制台输出，发现SimpleCov报告已经生成了：
- 
+
+ ![console](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/rcov_console.png)
 
 回到jenkins项目主页，可以直接点击查看生成的测试报告：
 
- 
+ ![jenkins-project](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/jenkins_project.png)
 
 
 测试报告的详情：
  
+ ![report-detail](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/rcov_detail.png)
 
 由于rottenpotato网站的代码中没有写rspec测试代码，所以没有example成功或失败，默认显示的覆盖率为100%。
 
-# 关于Blue Ocean：
+# 关于Blue Ocean
 Blue Ocean目前支持的jenkins job类型只有Multibranch Pipeline job，因此我们需要新建一个此类型的项目。在创建项目时，Blue Ocean提供了一个线性的创建流程，如果我们在远程仓库中预先写好jenkinsfile，那么当项目创建时，jenkins会根据jenkinsfile自动生成pipeline流程。
-
-
-
-
-
-
-	
