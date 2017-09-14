@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="jenkins,jenkins插件," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Jenkins插件作用机制调研Jenkins的插件实际上就是一个一个的Java class，jenkins 通过单独的类加载器加载每个插件以避免插件之间产生冲突。插件就像 Jenkins 内置的其他类一样参与到系统的活动中。另外，插件可以通过 XStream 持久化，可以由 Jelly 提供视图技术，可以提供图片等静态资源，插件中所有的功能可以无缝的加入到 Jenkins 内置的功能上。 我们开发">
+<meta name="keywords" content="jenkins,jenkins插件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jenkins插件作用机制">
+<meta property="og:url" content="http://yoursite.com/2017/09/14/Jenkins插件作用机制/index.html">
+<meta property="og:site_name" content="YF的博客">
+<meta property="og:description" content="Jenkins插件作用机制调研Jenkins的插件实际上就是一个一个的Java class，jenkins 通过单独的类加载器加载每个插件以避免插件之间产生冲突。插件就像 Jenkins 内置的其他类一样参与到系统的活动中。另外，插件可以通过 XStream 持久化，可以由 Jelly 提供视图技术，可以提供图片等静态资源，插件中所有的功能可以无缝的加入到 Jenkins 内置的功能上。 我们开发">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/jenkins-plugin.pic/cucumber_pi_structure.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/jenkins-plugin.pic/project_page.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/jenkins-plugin.pic/idea_config.png">
+<meta property="og:updated_time" content="2017-09-14T11:59:58.865Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jenkins插件作用机制">
+<meta name="twitter:description" content="Jenkins插件作用机制调研Jenkins的插件实际上就是一个一个的Java class，jenkins 通过单独的类加载器加载每个插件以避免插件之间产生冲突。插件就像 Jenkins 内置的其他类一样参与到系统的活动中。另外，插件可以通过 XStream 持久化，可以由 Jelly 提供视图技术，可以提供图片等静态资源，插件中所有的功能可以无缝的加入到 Jenkins 内置的功能上。 我们开发">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/jenkins-plugin.pic/cucumber_pi_structure.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/09/14/Jenkins插件作用机制/"/>
+
+
+
+
+
+  <title>Jenkins插件作用机制 | YF的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">YF的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/14/Jenkins插件作用机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="YoooFeng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="YF的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Jenkins插件作用机制</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-14T19:34:25+08:00">
+                2017-09-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术相关/" itemprop="url" rel="index">
+                    <span itemprop="name">技术相关</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/14/Jenkins插件作用机制/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/09/14/Jenkins插件作用机制/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/09/14/Jenkins插件作用机制/" class="leancloud_visitors" data-flag-title="Jenkins插件作用机制">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Jenkins插件作用机制调研"><a href="#Jenkins插件作用机制调研" class="headerlink" title="Jenkins插件作用机制调研"></a>Jenkins插件作用机制调研</h1><p>Jenkins的插件实际上就是一个一个的Java class，jenkins 通过单独的类加载器加载每个插件以避免插件之间产生冲突。插件就像 Jenkins 内置的其他类一样参与到系统的活动中。另外，插件可以通过 XStream 持久化，可以由 Jelly 提供视图技术，可以提供图片等静态资源，插件中所有的功能可以无缝的加入到 Jenkins 内置的功能上。</p>
+<p>我们开发的插件要想集成到jenkins中，在编写的时候就需要继承对应的jenkins提供的模板类，比方说我们要想编写一个参数类的插件，就需要（必须）继承jenkins官方提供的ParameterDefinition模板类，所有参数相关的插件都需要继承这个类。<br><a id="more"></a></p>
+<p>ParameterDefinition这个类中提前写好了配置job时输入参数的文本框，只有继承这个类，才能在job配置页面中的Add Parameter下拉框中看到我们编写的插件。换句话说，Jenkins使用继承模板类的方式将Jenkins本身与插件的接口提供给我们，我们也只能通过继承模板类的方式将我们的插件集成到jenkins中。这些模板中有一些基本的方法，例如文本框的名称，一些图标的定义等，我们可以通过override这些方法来进行个性化设计。</p>
+<p>Jenkins提供了一系列的basic building block，以供我们进行插件开发，这些blocks其实就是之前作者写的hudson包中的抽象类，比如说Action、Plugin、Api、RSS等。</p>
+<p>然后是我们要考虑的Jenkins插件是否可以进行远端服务器通信。在默认的情况下，Jenkins只为使用了Content-Security-Policy header的有限制的静态文件提供服务，来保证服务器的安全，CSP实际上就是一个白名单制度，开发者指定来自哪些站点的资源可以接收、加载。我们有这样的需求，需要jenkins接受来自第三方网站的测试报告（HTML页面或者别的什么），这样的报告来自我们部署该服务的站点，但是我们把插件做成一个服务，不可能要求每一个用户在使用插件之前先修改自己本地的jenkins CSP规则，所以我们需要想一个折中的方法，绕过CSP的机制，建立远程连接，展示我们的测试报告。</p>
+<p>Jenkins官方提供了Remote Access API相关功能及扩展，使得大部分jenkins的项目资源都可以远程进行访问。要想知道特定对象有哪些api接口，只需要在路径之后加入/api/即可，举个例子，访问我的jenkins服务器地址：localhost:8888/api/，可以看到jenkins系统层面暴露到外界的api接口，可以重启jenkens服务器、拷贝jenkins中的项目资源等；访问localhost:8888/job/myproject/api/，可以看到在项目层面jenkins提供的api接口，可以远程进行构建、删除该项目等。</p>
+<p>Jenkins内部维护的数据模型可以想象成一棵树，当用户向jenkins发送远程API请求时，相当于只向jenkins请求整个数据树的某棵子树，这棵子树的根节点即为用户请求的某一个job，这棵子树从根节点切断，这样做可以避免jenkins向用户发送过多数据，而只专注于某一个项目的数据。要是有特殊的需求，也可以进行调节，将这个数据子树从根节点向下扩展，调节节点的深度，获取更多的数据。具体的应用还需要进一步调研。</p>
+<p>Jenkins目前提供三种方式使用API接口，XML、JSON还有python。官方文档中演示了使用curl http的方式使用API接口。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">curl -X POST JENKINS_URL/job/JOB_NAME/build \</div><div class="line">  --user USER:TOKEN \</div><div class="line">  --data-urlencode json=&apos;&#123;&quot;parameter&quot;: [&#123;&quot;name&quot;:&quot;id&quot;, &quot;value&quot;:&quot;123&quot;&#125;, &#123;&quot;name&quot;:&quot;verbosity&quot;, &quot;value&quot;:&quot;high&quot;&#125;]&#125;&apos;</div></pre></td></tr></table></figure>
+<p>Jenkins支持使用USER_TOKEN和USER_NAME&amp;USER_PASSWORD的方式进行权限判定。但是目前jenkins还不支持以这种方式从第三方网站接收数据。</p>
+<h1 id="插件源码分析-–-以cucumber为例"><a href="#插件源码分析-–-以cucumber为例" class="headerlink" title="插件源码分析 – 以cucumber为例"></a>插件源码分析 – 以cucumber为例</h1><p>为了弄清楚jenkins插件的具体实现机制，我以Cucumber-reports-Plugin这个插件为例对Jenkins插件的源代码进行分析。</p>
+<p>下面是cucumber插件的项目结构：<br><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/jenkins-plugin.pic/cucumber_pi_structure.png" alt="structure"></p>
+<p>整个项目的组织结构如上图所示，其中主要部分由CucumberReportBaseAction、CucumberReportDescriptor、CucumberReportProjectAction、CucumberReportPulisher、SafeArchiveServingAction、SafeArchiveServingRunAction等六个Java类组成。</p>
+<h2 id="CucumberReportBaseAction"><a href="#CucumberReportBaseAction" class="headerlink" title="CucumberReportBaseAction"></a>CucumberReportBaseAction</h2><p>这个java类是继承自jenkins的hudson.model.Action类，Action类是在jenkins的某个界面上新建一个图标和链接，指向一个子空间，这个子空间显示一些插件本身提供的东西与用户交互。</p>
+<p>因此，这个类的主要作用就是，定义插件的名称、指向子空间的URL链接，还有插件显示的图标。</p>
+<h2 id="CucumberReportDescriptor"><a href="#CucumberReportDescriptor" class="headerlink" title="CucumberReportDescriptor"></a>CucumberReportDescriptor</h2><p>继承自hudson.tasks. BuildStepDescriptor类。类中的声明如下：</p>
+<pre><code>public class CucumberReportDescriptor extends BuildStepDescriptor&lt;Publisher&gt; {
+</code></pre><p>这个类继承自BuildStepDescriptor，使用的是Publisher模板。BuildStepDescriptor有两个template，一个是Builder，一个是Publisher，当指定模板为Builder时，说明这个插件是作用在构建过程中的，这个插件出现在jenkins项目设置中的 构建 一栏；当指定模板为Publisher时，说明这个插件是项目构建结束之后发挥作用的，出现在 构建后操作 一栏。</p>
+<p>Cucumber插件的测试报告显然是需要等项目成功构建之后才能发挥作用的，所以是指定为Publisher。在 构建 或者 构建后操作 选择使用此插件后，需要用户输入的一些参数也是在这里指定的，比如下面的几行代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">   public ListBoxModel doFillBuildStatusItems() &#123;</div><div class="line">      return new ListBoxModel(</div><div class="line">         // default option should be listed first</div><div class="line">         new ListBoxModel.Option(Messages.BuildStatus_unchanged(), null),</div><div class="line">         new ListBoxModel.Option(Messages.BuildStatus_FAILURE(),Result.FAILURE.toString()),</div><div class="line">         new ListBoxModel.Option(Messages.BuildStatus_UNSTABLE(),</div><div class="line">Result.UNSTABLE.toString()));</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>这几行代码作用就是新建了一些ListBox，供用户对插件进行配置。所以，这个类的主要作用就是在jenkins的项目配置界面中嵌入插件，使之对用户可用。</p>
+<h2 id="CucumberReportProjectAction"><a href="#CucumberReportProjectAction" class="headerlink" title="CucumberReportProjectAction"></a>CucumberReportProjectAction</h2><p>类的声明如下：</p>
+<pre><code>public class CucumberReportProjectAction extends CucumberReportBaseAction implements ProminentProjectAction {
+</code></pre><p>继承自之前的CucumberReportBaseAction类，同时实现了ProminentProjectAction接口。之前的CucumberReportBaseAction类只是设置了插件的名称、图标等，这个类就具体指定了这个插件的子界面链接出现在项目的主页面，下面这张图指的就是项目的主界面：<br><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/jenkins-plugin.pic/project_page.png" alt="project-page"></p>
+<h2 id="CucumberReportPulisher"><a href="#CucumberReportPulisher" class="headerlink" title="*CucumberReportPulisher"></a>*CucumberReportPulisher</h2><p>这个类就是该插件的主要实现类了，它的声明如下：</p>
+<pre><code>public class CucumberReportPublisher extends Publisher implements SimpleBuildStep {
+</code></pre><p>继承了Publisher类，还有实现了jenkins.tasks.SimpleBuildStep类。这个类中实现了SimpleBuildStep中提供的perform方法，这个方法中是插件方法的具体实现与执行。</p>
+<p>关于Cucumber的功能，作者只需要直接import所有cucumber的java实现包，这些包往往都提供了一系列的接口，因此只要将这些接口应用到代码中即可。</p>
+<p>从机制上来看，如果我们需要的功能已经有了现成的java实现，我们只需要进行一些简单的jenkins页面的编辑和设定，然后引入这些java实现包作为API使用即可。对于那些没有java实现的功能，可能就需要我们用java自己实现了。</p>
+<p>类中还有一个关键字：@DataBoundSetter。这个来自包org.kohsuke.stapler.DataBoundSetter，是stapler的一部分。Stapler的运行机制是，首先调用DataBoundConstructor方法，如果里面定义的属性在JSON文件中存在，那么就去找这个属性的DataBoundSetter，将JSON文件中的属性改为代码指定的值。setter中属性的名字必须与JSON中的名字一致。</p>
+<h2 id="SafeArchiveServingAction-amp-SafeArchiveServingRunAction"><a href="#SafeArchiveServingAction-amp-SafeArchiveServingRunAction" class="headerlink" title="SafeArchiveServingAction&amp;SafeArchiveServingRunAction"></a>SafeArchiveServingAction&amp;SafeArchiveServingRunAction</h2><p>这两个类是用来生成和展示其他格式的cucumber报告的。如上文所说，jenkins是不运行加载和运行没有CSP header的HTML页面的，cucumber生成的报告是HTML格式，而且显然没有CSP Header。插件作者提出了一个目前很多Plugin都在使用的一个替代解决方法，使用hudson.model.DirectoryBrowserSupport类为生成的报告提供服务。DirectoryBrowserSupport的工作原理是，当项目进行构建的时候，首先扫描一次项目目录，记录所有文件的checksum，当要求为这些文件提供服务时，检查文件的checksum是否一致，只为一致的文件提供服务。</p>
+<h1 id="Jenkins插件开发"><a href="#Jenkins插件开发" class="headerlink" title="Jenkins插件开发"></a>Jenkins插件开发</h1><h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><ul>
+<li>Jenkins本身是使用java编写的，所以要想开发jenkins插件，需要安装JDK8开发环境。</li>
+<li>安装Maven开发环境。</li>
+<li>配置Maven。在目录~/.m2下新建文件settings.xml，输入以下内容：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">&lt;settings&gt;</div><div class="line">  &lt;pluginGroups&gt;</div><div class="line">    &lt;pluginGroup&gt;org.jenkins-ci.tools&lt;/pluginGroup&gt;</div><div class="line">  &lt;/pluginGroups&gt;</div><div class="line"></div><div class="line">  &lt;profiles&gt;</div><div class="line">    &lt;profile&gt;</div><div class="line">      &lt;id&gt;jenkins&lt;/id&gt;</div><div class="line">      &lt;activation&gt;</div><div class="line">        &lt;activeByDefault&gt;true&lt;/activeByDefault&gt; </div><div class="line">      &lt;/activation&gt;</div><div class="line">      &lt;repositories&gt; </div><div class="line">        &lt;repository&gt;</div><div class="line">          &lt;id&gt;repo.jenkins-ci.org&lt;/id&gt;</div><div class="line">          &lt;url&gt;https://repo.jenkins-ci.org/public/&lt;/url&gt;</div><div class="line">        &lt;/repository&gt;</div><div class="line">      &lt;/repositories&gt;</div><div class="line">      &lt;pluginRepositories&gt;</div><div class="line">        &lt;pluginRepository&gt;</div><div class="line">          &lt;id&gt;repo.jenkins-ci.org&lt;/id&gt;</div><div class="line">          &lt;url&gt;https://repo.jenkins-ci.org/public/&lt;/url&gt;</div><div class="line">        &lt;/pluginRepository&gt;</div><div class="line">      &lt;/pluginRepositories&gt;</div><div class="line">    &lt;/profile&gt;</div><div class="line">  &lt;/profiles&gt;</div></pre></td></tr></table></figure>
+<ul>
+<li>pluginGroup ：允许在命令行中使用缩写hpi代替org.jenkins-ci.tools:maven-hpi-plugin；</li>
+<li>activeByDefault：如果同时有其他开发项目在使用maven，设置为false；</li>
+<li>repositories：执行hpi:create命令需要。</li>
+</ul>
+<p>在IDE中进行配置，以IDEA为例：</p>
+<p><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/jenkins-plugin.pic/idea_config.png" alt="idea-config"></p>
+<h2 id="创建插件开发项目"><a href="#创建插件开发项目" class="headerlink" title="创建插件开发项目"></a>创建插件开发项目</h2><p>输入命令mvn -u hpi:create。然后命令台会出现提示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Enter the groupId of your plugin [org.jenkins-ci.plugins]: </div><div class="line">Enter the artifactId of your plugin (normally without &apos;-plugin&apos; suffix): demo </div><div class="line">[INFO] Defaulting package to group ID + artifact ID: org.jenkins-ci.plugins.demo </div><div class="line">[WARNING] Package name contains invalid characters. Replacing it with ‘org.jenkinsci.plugins.demo&apos;</div></pre></td></tr></table></figure>
+<ul>
+<li>groupId：开发者信息，可以使用默认值；</li>
+<li>artifactId：插件名，也会作为项目的文件夹名。</li>
+</ul>
+<p>新建项目之后，使用以下命令查看构建是否成功：</p>
+<pre><code>$ cd demo 
+$ mvn verify
+</code></pre><p>随后就可以进入正常开发，过程中使用如下命令进行运行，此命令会打开一个本地的带当前开发插件的jenkins服务器，地址为<a href="http://localhost:8080/jenkins：" target="_blank" rel="external">http://localhost:8080/jenkins：</a></p>
+<pre><code>$ mvn hpi:run
+</code></pre><p>如果需要断点调试，可以运行如下命令，此命令会在8000端口建立监听，然后可以在IDE中配置对应的Run/Debug Configuration，配置完后运行Debug就会自动触发插件编译和运行流程。</p>
+<pre><code>$ mvnDebug hpi:run
+</code></pre><h2 id="打包插件"><a href="#打包插件" class="headerlink" title="打包插件"></a>打包插件</h2><p>完成开发后，只需要使用命令：</p>
+<pre><code>$ mvn clean install
+</code></pre><p>就可以将编写的插件代码打包成一个.hpi文件（相当于一个jar包），然后上传到jenkins的服务器，这样就可以安装使用插件了。</p>
+<h1 id="总结-amp-计划"><a href="#总结-amp-计划" class="headerlink" title="总结&amp;计划"></a>总结&amp;计划</h1><p>目前已经明确的是，第三方站点从jenkins获取项目文件、进行测试、生成测试报告是可行的，具体的实现方法还需要调研。但是生成了测试报告后，将这个报告集成到jenkins中，更远一点说，用这个报告的结果影响jenkins的pipeline过程，目前来看还比较困难。</p>
+<p>接下来几周准备继续熟悉jenkins的插件机制和官方提供的API接口，并且自己动手开发一个简单的jenkins插件，主要目的是实现jenkins与远端服务器的通信和数据交互。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/jenkins/" rel="tag"># jenkins</a>
+          
+            <a href="/tags/jenkins插件/" rel="tag"># jenkins插件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/14/使用DocLinks插件展示ROR项目测试结果/" rel="next" title="使用DocLinks插件展示ROR项目测试结果">
+                <i class="fa fa-chevron-left"></i> 使用DocLinks插件展示ROR项目测试结果
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微薄</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="YoooFeng" />
+          <p class="site-author-name" itemprop="name">YoooFeng</p>
+           
+              <p class="site-description motion-element" itemprop="description">Interesting.</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Jenkins插件作用机制调研"><span class="nav-number">1.</span> <span class="nav-text">Jenkins插件作用机制调研</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#插件源码分析-–-以cucumber为例"><span class="nav-number">2.</span> <span class="nav-text">插件源码分析 – 以cucumber为例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CucumberReportBaseAction"><span class="nav-number">2.1.</span> <span class="nav-text">CucumberReportBaseAction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CucumberReportDescriptor"><span class="nav-number">2.2.</span> <span class="nav-text">CucumberReportDescriptor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CucumberReportProjectAction"><span class="nav-number">2.3.</span> <span class="nav-text">CucumberReportProjectAction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CucumberReportPulisher"><span class="nav-number">2.4.</span> <span class="nav-text">*CucumberReportPulisher</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SafeArchiveServingAction-amp-SafeArchiveServingRunAction"><span class="nav-number">2.5.</span> <span class="nav-text">SafeArchiveServingAction&SafeArchiveServingRunAction</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Jenkins插件开发"><span class="nav-number">3.</span> <span class="nav-text">Jenkins插件开发</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#环境配置"><span class="nav-number">3.1.</span> <span class="nav-text">环境配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建插件开发项目"><span class="nav-number">3.2.</span> <span class="nav-text">创建插件开发项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#打包插件"><span class="nav-number">3.3.</span> <span class="nav-text">打包插件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结-amp-计划"><span class="nav-number">4.</span> <span class="nav-text">总结&计划</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YoooFeng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://YF.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/09/14/Jenkins插件作用机制/';
+          this.page.identifier = '2017/09/14/Jenkins插件作用机制/';
+          this.page.title = 'Jenkins插件作用机制';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://YF.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("WtbyQxPrTlpWcc6MO3qFCWib-gzGzoHsz", "gioE7D4TNuIfpKq4Nq3OXWCW");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+</body>
+</html>
+
+ <!-- 背景动画 -->
+<script type="text/javascript" src="/js/src/particle.js"></script>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love_click.js"></script>

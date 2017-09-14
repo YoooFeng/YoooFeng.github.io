@@ -107,7 +107,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/rcov_console.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/jenkins_project.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/rcov_detail.png">
-<meta property="og:updated_time" content="2017-09-13T06:31:32.123Z">
+<meta property="og:updated_time" content="2017-09-13T06:59:41.268Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用DocLinks插件展示ROR项目测试结果">
 <meta name="twitter:description" content="Jenkins中ROR插件调研把rottenpotatoes网站部署好之后，还需要对提交的代码进行一系列测试和处理，比如是否符合TDD、BDD的开发准则，测试覆盖度是否达到标准，代码风格是否符合规范等等，这需要一系列的工具或插件来支撑。目前具体的需求还不是很清楚，我对jenkins上对ROR项目进行支撑的插件进行了一些调研，并且提出了一个简单的解决方案。">
@@ -436,7 +436,7 @@ gem ‘simplecov-rcov’, :require=&gt;false, group: :test
 <p>测试报告的详情：</p>
 <p> <img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/rcov_detail.png" alt="report-detail"></p>
 <p>由于rottenpotato网站的代码中没有写rspec测试代码，所以没有example成功或失败，默认显示的覆盖率为100%。</p>
-<h1 id="关于Blue-Ocean："><a href="#关于Blue-Ocean：" class="headerlink" title="关于Blue Ocean："></a>关于Blue Ocean：</h1><p>Blue Ocean目前支持的jenkins job类型只有Multibranch Pipeline job，因此我们需要新建一个此类型的项目。在创建项目时，Blue Ocean提供了一个线性的创建流程，如果我们在远程仓库中预先写好jenkinsfile，那么当项目创建时，jenkins会根据jenkinsfile自动生成pipeline流程。</p>
+<h1 id="关于Blue-Ocean"><a href="#关于Blue-Ocean" class="headerlink" title="关于Blue Ocean"></a>关于Blue Ocean</h1><p>Blue Ocean目前支持的jenkins job类型只有Multibranch Pipeline job，因此我们需要新建一个此类型的项目。在创建项目时，Blue Ocean提供了一个线性的创建流程，如果我们在远程仓库中预先写好jenkinsfile，那么当项目创建时，jenkins会根据jenkinsfile自动生成pipeline流程。</p>
 
       
     </div>
@@ -480,6 +480,10 @@ gem ‘simplecov-rcov’, :require=&gt;false, group: :test
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/14/Jenkins插件作用机制/" rel="prev" title="Jenkins插件作用机制">
+                Jenkins插件作用机制 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -589,7 +593,7 @@ var jiathis_config={
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">6</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -611,7 +615,7 @@ var jiathis_config={
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-count">9</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -646,7 +650,7 @@ var jiathis_config={
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Jenkins中ROR插件调研"><span class="nav-number">1.</span> <span class="nav-text">Jenkins中ROR插件调研</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Ruby-Plugin"><span class="nav-number">1.1.</span> <span class="nav-text">Ruby Plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RubyMetrics-plugin"><span class="nav-number">1.2.</span> <span class="nav-text">*RubyMetrics plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cucumber-report-plugin"><span class="nav-number">1.3.</span> <span class="nav-text">Cucumber-report-plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Junit-Plugin"><span class="nav-number">1.4.</span> <span class="nav-text">Junit Plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Brakeman-Plugin"><span class="nav-number">1.5.</span> <span class="nav-text">Brakeman Plugin</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决方案"><span class="nav-number">2.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于Blue-Ocean："><span class="nav-number">3.</span> <span class="nav-text">关于Blue Ocean：</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Jenkins中ROR插件调研"><span class="nav-number">1.</span> <span class="nav-text">Jenkins中ROR插件调研</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Ruby-Plugin"><span class="nav-number">1.1.</span> <span class="nav-text">Ruby Plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RubyMetrics-plugin"><span class="nav-number">1.2.</span> <span class="nav-text">*RubyMetrics plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cucumber-report-plugin"><span class="nav-number">1.3.</span> <span class="nav-text">Cucumber-report-plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Junit-Plugin"><span class="nav-number">1.4.</span> <span class="nav-text">Junit Plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Brakeman-Plugin"><span class="nav-number">1.5.</span> <span class="nav-text">Brakeman Plugin</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决方案"><span class="nav-number">2.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于Blue-Ocean"><span class="nav-number">3.</span> <span class="nav-text">关于Blue Ocean</span></a></li></ol></div>
             
 
           </div>
