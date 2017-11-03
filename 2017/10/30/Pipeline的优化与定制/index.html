@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="jenkins,doclinks,测试," />
+  <meta name="keywords" content="jenkins,jenkins pipeline,jenkins shared library," />
 
 
 
@@ -94,24 +94,18 @@
 
 
 
-<meta name="description" content="Jenkins中ROR插件调研把rottenpotatoes网站部署好之后，还需要对提交的代码进行一系列测试和处理，比如是否符合TDD、BDD的开发准则，测试覆盖度是否达到标准，代码风格是否符合规范等等，这需要一系列的工具或插件来支撑。目前具体的需求还不是很清楚，我对jenkins上对ROR项目进行支撑的插件进行了一些调研，并且提出了一个简单的解决方案。">
-<meta name="keywords" content="jenkins,doclinks,测试">
+<meta name="description" content="写在前面项目需求要求对Jenkins Pipeline的功能尝试进行一些改进。对Jenkins进行了一些调研，将资料和过程记录下来。 Jenkins的PipelinePipeline的源代码Jenkins的pipeline原先是一个插件，独立于jenkins核心代码，作为一个单独的java类文件在启动时被加载。现在jenkins官方将pipeline作为jenkins的核心功能之一进行维护，加入到">
+<meta name="keywords" content="jenkins,jenkins pipeline,jenkins shared library">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用DocLinks插件展示ROR项目测试结果">
-<meta property="og:url" content="http://yoursite.com/2017/09/14/使用DocLinks插件展示ROR项目测试结果/index.html">
+<meta property="og:title" content="Pipeline的优化与定制">
+<meta property="og:url" content="http://yoursite.com/2017/10/30/Pipeline的优化与定制/index.html">
 <meta property="og:site_name" content="YF的博客">
-<meta property="og:description" content="Jenkins中ROR插件调研把rottenpotatoes网站部署好之后，还需要对提交的代码进行一系列测试和处理，比如是否符合TDD、BDD的开发准则，测试覆盖度是否达到标准，代码风格是否符合规范等等，这需要一系列的工具或插件来支撑。目前具体的需求还不是很清楚，我对jenkins上对ROR项目进行支撑的插件进行了一些调研，并且提出了一个简单的解决方案。">
+<meta property="og:description" content="写在前面项目需求要求对Jenkins Pipeline的功能尝试进行一些改进。对Jenkins进行了一些调研，将资料和过程记录下来。 Jenkins的PipelinePipeline的源代码Jenkins的pipeline原先是一个插件，独立于jenkins核心代码，作为一个单独的java类文件在启动时被加载。现在jenkins官方将pipeline作为jenkins的核心功能之一进行维护，加入到">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/add_Rcov.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/setting_doclinks.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/rcov_console.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/jenkins_project.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/rcov_detail.png">
-<meta property="og:updated_time" content="2017-09-13T06:59:41.268Z">
+<meta property="og:updated_time" content="2017-11-03T07:18:42.569Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="使用DocLinks插件展示ROR项目测试结果">
-<meta name="twitter:description" content="Jenkins中ROR插件调研把rottenpotatoes网站部署好之后，还需要对提交的代码进行一系列测试和处理，比如是否符合TDD、BDD的开发准则，测试覆盖度是否达到标准，代码风格是否符合规范等等，这需要一系列的工具或插件来支撑。目前具体的需求还不是很清楚，我对jenkins上对ROR项目进行支撑的插件进行了一些调研，并且提出了一个简单的解决方案。">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/add_Rcov.png">
+<meta name="twitter:title" content="Pipeline的优化与定制">
+<meta name="twitter:description" content="写在前面项目需求要求对Jenkins Pipeline的功能尝试进行一些改进。对Jenkins进行了一些调研，将资料和过程记录下来。 Jenkins的PipelinePipeline的源代码Jenkins的pipeline原先是一个插件，独立于jenkins核心代码，作为一个单独的java类文件在启动时被加载。现在jenkins官方将pipeline作为jenkins的核心功能之一进行维护，加入到">
 
 
 
@@ -141,13 +135,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/09/14/使用DocLinks插件展示ROR项目测试结果/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/10/30/Pipeline的优化与定制/"/>
 
 
 
 
 
-  <title>使用DocLinks插件展示ROR项目测试结果 | YF的博客</title>
+  <title>Pipeline的优化与定制 | YF的博客</title>
   
 
 
@@ -284,7 +278,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/14/使用DocLinks插件展示ROR项目测试结果/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/30/Pipeline的优化与定制/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="YoooFeng">
@@ -301,7 +295,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">使用DocLinks插件展示ROR项目测试结果</h1>
+          <h1 class="post-title" itemprop="name headline">Pipeline的优化与定制</h1>
         
 
         <div class="post-meta">
@@ -313,8 +307,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-14T14:11:28+08:00">
-                2017-09-14
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-30T10:15:00+08:00">
+                2017-10-30
               </time>
             
 
@@ -354,9 +348,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/09/14/使用DocLinks插件展示ROR项目测试结果/#comments" itemprop="discussionUrl">
+                <a href="/2017/10/30/Pipeline的优化与定制/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/09/14/使用DocLinks插件展示ROR项目测试结果/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2017/10/30/Pipeline的优化与定制/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -364,7 +358,7 @@
 
           
           
-             <span id="/2017/09/14/使用DocLinks插件展示ROR项目测试结果/" class="leancloud_visitors" data-flag-title="使用DocLinks插件展示ROR项目测试结果">
+             <span id="/2017/10/30/Pipeline的优化与定制/" class="leancloud_visitors" data-flag-title="Pipeline的优化与定制">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -395,48 +389,52 @@
       
 
       
-        <h1 id="Jenkins中ROR插件调研"><a href="#Jenkins中ROR插件调研" class="headerlink" title="Jenkins中ROR插件调研"></a>Jenkins中ROR插件调研</h1><p>把rottenpotatoes网站部署好之后，还需要对提交的代码进行一系列测试和处理，比如是否符合TDD、BDD的开发准则，测试覆盖度是否达到标准，代码风格是否符合规范等等，这需要一系列的工具或插件来支撑。目前具体的需求还不是很清楚，我对jenkins上对ROR项目进行支撑的插件进行了一些调研，并且提出了一个简单的解决方案。</p>
-<a id="more"></a>
-<h2 id="Ruby-Plugin"><a href="#Ruby-Plugin" class="headerlink" title="Ruby Plugin"></a>Ruby Plugin</h2><p>这个插件的工作原理类似于Shell builder，在下图中输入你想要运行的ruby脚本，系统默认的ruby编译器就会去执行文本框中的ruby脚本代码。</p>
-<h2 id="RubyMetrics-plugin"><a href="#RubyMetrics-plugin" class="headerlink" title="*RubyMetrics plugin"></a>*RubyMetrics plugin</h2><p>一个分析ruby代码的工具，支持分析Rcov – Code Coverage for Ruby，并且可以将分析的结果自动生成图表展示。举例来说，只需要使用命令Rspec,所有的测试就会自动进行，测试的覆盖率也一并计算，最后生成的是一些图片和表格，对整个测试的情况进行总结。</p>
-<p>我们首先在jenkins插件中心安装RubyMetrcs Plugin插件，要使用插件，我们在项目配置中进行设置。<br>进入“构建后操作”这一栏，点击“增加构建后操作步骤”，选择“Publish Rcov report”，出现如下界面：</p>
-<p><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/add_Rcov.png" alt="rcov"></p>
-<p>然后我们只需要设置好生成Rcov报告的目录，以及各项指标的的阈值，在项目完成构建后，就会在我们指定的目录生成Rcov Report。除此之外，我们还需要修改一下项目的Gemfile和spec/spec_helper.rb。<br>我们在Gemfile中加入以下代码：</p>
-<pre><code># Gemfile
-gem &apos;simplecov&apos;, :require =&gt; false, :group =&gt; :test
-gem &apos;simplecov-rcov&apos;
-</code></pre><p>在spec_helper.rb中在文件开头加入以下代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"># spec_helper.rb</div><div class="line">require &apos;simplecov&apos;</div><div class="line">require &apos;simplecov-rcov&apos;</div><div class="line">SimpleCov.formatter = SimpleCov::Formatter::RcovFormatter</div><div class="line">SimpleCov.start &apos;rails&apos;</div></pre></td></tr></table></figure>
-<p>RottenPotatoes似乎没有写单元测试的测试用例，rspec无法进行，因此当jenkins执行构建时会显示rcov report index file wasn’t found. Google了一下没有找到解决方案，后面可能需要手动加入几个测试用例。</p>
-<h2 id="Cucumber-report-plugin"><a href="#Cucumber-report-plugin" class="headerlink" title="Cucumber-report-plugin"></a>Cucumber-report-plugin</h2><p>一个测试项目代码是否符合Behavioral Driven Design的插件，可以自动生成HTML形式的测试结果，但是目前该插件集成的是cucumber的java实现版本cucumber-jvm。</p>
-<h2 id="Junit-Plugin"><a href="#Junit-Plugin" class="headerlink" title="Junit Plugin"></a>Junit Plugin</h2><p>测试失败，项目构建不成功。</p>
-<h2 id="Brakeman-Plugin"><a href="#Brakeman-Plugin" class="headerlink" title="Brakeman Plugin"></a>Brakeman Plugin</h2><p>对ruby on rails项目进行安全检测的插件，目前无此需求。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>通过调研，最后我选择的解决方法是在命令行中利用shell代码进行rspec测试、生成Rcov报告，然后利用一个通用的jenkins插件DocLinks，将生成的报告集成到项目管理界面上。之后对rails项目进行分析和测试也可以自己选择想进行的测试工具（如cucumber等），然后在命令行中执行测试，最后只需要将结果集成到jenkins中即可。具体的配置过程如下：<br>首先在jenkins中安装Doclinks插件，这里不再详细描述。</p>
-<p>然后编辑项目目录下的Gemfile文件和spec_helper文件：</p>
-<pre><code>#Gemfile
-#Add lines
-gem ‘simplecov’, :require=&gt;false, group: :test
-gem ‘simplecov-rcov’, :require=&gt;false, group: :test
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">#spec_helper.rb</div><div class="line">#加在所有测试代码运行之前，即文件最开头</div><div class="line">require ‘simplecov’</div><div class="line">require ‘simplecov-rcov’</div><div class="line"></div><div class="line">SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter</div><div class="line">SimpleCov.start</div></pre></td></tr></table></figure>
-<p>进入jenkins的项目配置页面，在构建-&gt;Execute shell中最后加入运行rspec测试的命令：</p>
-<pre><code>rspec spec
-</code></pre><p>项目配置-&gt;构建后操作-&gt;增加构建后操作步骤，选择选项publish documents，进行如下配置：</p>
-<p><img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/setting_doclinks.png" alt="doclinks"></p>
-<p>参数说明：</p>
+        <h3 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h3><p>项目需求要求对Jenkins Pipeline的功能尝试进行一些改进。对Jenkins进行了一些调研，将资料和过程记录下来。</p>
+<h3 id="Jenkins的Pipeline"><a href="#Jenkins的Pipeline" class="headerlink" title="Jenkins的Pipeline"></a>Jenkins的Pipeline</h3><h4 id="Pipeline的源代码"><a href="#Pipeline的源代码" class="headerlink" title="Pipeline的源代码"></a>Pipeline的源代码</h4><p>Jenkins的pipeline原先是一个插件，独立于jenkins核心代码，作为一个单独的java类文件在启动时被加载。现在jenkins官方将pipeline作为jenkins的核心功能之一进行维护，加入到了jenkins的核心代码中。目前pipeline在github上叫workflow，并且被拆分成了几个不同插件模块：</p>
 <ul>
-<li>Title：显示的文件名；</li>
-<li>Description：对文件的说明；</li>
-<li>Dictionary to archive：文件所在目录（simplecov默认为项目目录下的coverage文件夹）</li>
-<li>Index file：显示的主页面</li>
+<li>workflow-step-api-plugin</li>
+<li>workflow-basic-steps-plugin</li>
+<li>workflow-api-plugin</li>
+<li>workflow-support-plugin</li>
+<li>workflow-job-plugin</li>
+<li>workflow-durable-task-step-plugin</li>
+<li>workflow-scm-step-plugin</li>
+<li>pipeline-build-step-plugin + pipeline-input-step-plugin + pipeline-stage-step-plugin（功能相近）</li>
+<li>pipeline-stage-view-plugin</li>
+<li>workflow-cps-plugin</li>
+<li>workflow-cps-global-lib-plugin</li>
+<li>workflow-aggregator-plugin。</li>
 </ul>
-<p>保存设置，对项目进行构建，查看控制台输出，发现SimpleCov报告已经生成了：</p>
-<p> <img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/rcov_console.png" alt="console"></p>
-<p>回到jenkins项目主页，可以直接点击查看生成的测试报告：</p>
-<p> <img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/jenkins_project.png" alt="jenkins-project"></p>
-<p>测试报告的详情：</p>
-<p> <img src="https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/doclinks_jenkins.pic/rcov_detail.png" alt="report-detail"></p>
-<p>由于rottenpotato网站的代码中没有写rspec测试代码，所以没有example成功或失败，默认显示的覆盖率为100%。</p>
-<h1 id="关于Blue-Ocean"><a href="#关于Blue-Ocean" class="headerlink" title="关于Blue Ocean"></a>关于Blue Ocean</h1><p>Blue Ocean目前支持的jenkins job类型只有Multibranch Pipeline job，因此我们需要新建一个此类型的项目。在创建项目时，Blue Ocean提供了一个线性的创建流程，如果我们在远程仓库中预先写好jenkinsfile，那么当项目创建时，jenkins会根据jenkinsfile自动生成pipeline流程。</p>
+<p>具体每个plugin的功能可以在pipeline文档中找到：<br><a href="https://github.com/jenkinsci/pipeline-plugin/blob/master/CONTRIBUTING.md" target="_blank" rel="external">https://github.com/jenkinsci/pipeline-plugin/blob/master/CONTRIBUTING.md</a></p>
+<p>我想实现的功能是在pipeline的执行流程中插入一个标记，使得原先只能从上到下线性执行的pipeline流程可以实现回溯、跳转、重复执行stage等功能。<del>因此，需要先明确上面拆分的这么多插件中，哪一个是我们需要改动的。</del>如果对jenkins源码进行了修改，那么我们可能需要跟随jenkins的版本更迭维护修改的部分，所以理想的做法是在jenkins之上再添加一层我们个性化修改之后的东西，这样便于维护和使用。<br><a id="more"></a></p>
+<h4 id="什么是shared-library"><a href="#什么是shared-library" class="headerlink" title="什么是shared library"></a>什么是shared library</h4><p>官方提供一个名叫shared library的机制，允许我们对pipeline流程进行一些优化和定制。通过这个机制，我们可以定义一些变量、函数，以供在pipeline流程之中使用。Shared library的目录结构如下：</p>
+<p>(root)<br>+- src                     # Groovy source files<br>|&emsp;&emsp;  +- org<br>|&emsp;&emsp;&emsp;&emsp;   +- foo<br>|&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;+- Bar.groovy  # for org.foo.Bar class<br>+- vars<br>|&emsp;&emsp;+- foo.groovy          # for global ‘foo’ variable<br>|&emsp;&emsp;+- foo.txt             # help for ‘foo’ variable<br>+- resources               # resource files (external libraries only)<br>|&emsp;&emsp;+- org<br>|&emsp;&emsp;&emsp;&emsp;+- foo<br>|&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;+- bar.json    # static helper data for org.foo.Bar  </p>
+<p>src目录是存放主要代码的目录，通过@Library标记和import语句，在jenkinsfile中引入我们定义的Groovy函数；在vars目录下，定义全局函数和变量，这些函数和变量在pipeline流程中可以被直接调用。这些我们定义的.groovy文件有很高的权限，可以调用Java、Groovy、Jenkins内部API、Jenkins插件或者第三方库。</p>
+<h4 id="Shared-library-从jenkins的机制说起"><a href="#Shared-library-从jenkins的机制说起" class="headerlink" title="Shared library - 从jenkins的机制说起"></a>Shared library - 从jenkins的机制说起</h4><p>这部分内容主要介绍jenkins的运行机制，以及Shared library是如何集成到jenkins中产生作用的。</p>
+<p>Jenkins的运作主要由stapler和jelly两大核心模块构成。简单来说Stapler通过反射机制，将 URL 绑定到应用程序对象。Stapler的工作机制很好理解，比如说Hudson实例被映射到了路由的根路径，对于二级路径/project（Project是一个Java类），即会被映射为Hudson对象的一个getProject方法；如果Project下还有下一级的路由比如/project/status（status同样也是java类），那么getProject就会返回一个带有getStatus方法的对象，依次类推。而Jelly则是一种约定大于配置的页面渲染机制，不展开说了。</p>
+<p>Jenkins中的插件实际上是一个一个的Java class，Jenkins在启动时通过单独的类加载器加载每个插件。Jenkins提供了一些basic building block，我们开发插件需要继承相应的类，然后来实现我们的功能。</p>
+<p>所以从设计理念上说，Jenkins的core核心代码部分其实只有Stapler、Jelly、还有一些定义的抽象的model、security规则，其余的功能可以都看作是plugin，比如说pipeline，最开始也是一个plugin，后来官方觉得这个功能不错，官方来维护，现在这个插件嵌入了核心代码中（安装时不可选不安装）。</p>
+<p>Shared Libraray实际上也是Jenkins的一个插件，名叫workflow-cps-global-lib-plugin。既然是插件，那么必然是java类，也继承了Jenkins提供的basic building block。我们查看shared library的源代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">//workflow-cps-global-lib-plugin/.../GroovyShellDecoratorImpl.java</div><div class="line"></div><div class="line">import groovy.lang.GroovyClassLoader;</div><div class="line">import groovy.lang.GroovyShell;</div><div class="line">import hudson.Extension;</div><div class="line">import org.jenkinsci.plugins.workflow.cps.CpsFlowExecution;</div><div class="line">import org.jenkinsci.plugins.workflow.cps.GroovyShellDecorator;</div><div class="line">...</div><div class="line">@Extension</div><div class="line">public class GroovyShellDecoratorImpl extends GroovyShellDecorator &#123;</div><div class="line">......</div><div class="line">shell.getClassLoader().addURL(new File(repo.workspace,&quot;src&quot;).toURI().toURL());</div><div class="line"></div><div class="line">shell.getClassLoader().addURL(new File(repo.workspace, UserDefinedGlobalVariable.PREFIX).toURI().toURL());</div><div class="line">...</div></pre></td></tr></table></figure>
+<p>Shared Library实质就是用户编写的Groovy function，插件做的事情就是在将这些.groovy文件作为class，load到Jenkins的Groovy class库中，然后在jenkinsfile中用户可以通过@Libraray标记import和使用自己定义的函数或者变量。在方法的定义之前有一个@Extension标识，功能类似于微服务中的服务发现和服务注册，Jenkins遇到这个标识就会自动生成一个该class的实例，然后把这个class放到Extensionlist中。</p>
+<h4 id="在jenkinsfile中使用shared-library"><a href="#在jenkinsfile中使用shared-library" class="headerlink" title="在jenkinsfile中使用shared library"></a>在jenkinsfile中使用shared library</h4><p>在jenkinsfile中，要调用这些shared library，需要标注@Library(‘Your-Library-name’)。在Jenkins job的构建过程中，Jenkins首先检查和下载shared library的更新，然后再执行jenkinsfile。在.groovy文件中我们可以定义多个pipeline，然后根据执行情况和设定的条件选择执行哪一个pipeline，但是一次build只能执行一个pipeline，如果尝试执行第二个，会提示build失败。</p>
+<h3 id="开始实践"><a href="#开始实践" class="headerlink" title="开始实践"></a>开始实践</h3><p>有了以上的背景介绍，接下来我们开始实现我们需要的功能。目标项目是一个利用ant脚本执行简单junit测试的java程序，我预期想要实现的功能包括：</p>
+<ul>
+<li>重复进行某个stage</li>
+<li>根据stage的执行结果，跳转执行指定的stage</li>
+</ul>
+<p>我用Groovy语言实现了一个简单的函数，当抛出异常时，用户选择可以重试该函数，这个函数包含一个代码块，里面可以写所有steps支持的操作，然后函数在一个stage中被执行。也就是说，我们把本来应该直接写在stage中的steps操作，用一个可以自动重试的函数包裹了一层，将要执行的操作作为函数的一个参数，这样来实现我们就可以通过重复执行这个函数来达到自动重试stage的功能。同样，要想实现执行指定的stage的功能，只需要调用指定的函数即可。</p>
+<p>在将这个函数应用到jenkinsfile的过程中，遇到了一些问题，记录下来：</p>
+<ul>
+<li>@Library、import的标注可以统一写在pipeline之外，整个jenkinsfile的最前面，如果import写在pipeline里面会导致报错，IMPORT type unknown</li>
+<li>我们在stage-&gt;steps中调用我们定义的函数时，要将代码块放在script{}中</li>
+<li>我在按以往的流程使用命令操作时提示文件不存在，查阅资料之后发现，因为函数中的steps是在node代码块中执行的，在jenkins机制下这种方式可以指定一个特定的slave执行，如果没指定，则默认在本机另外新建一个沙箱，在项目名为Your-Project-Name@xxx的目录下对项目进行操作，所以在写node代码的时候要加入check scm命令，把git上的源代码pull下来。</li>
+<li>Jenkins考虑到安全问题，默认禁止shared library中用户定义的方法再调用和访问jenkins内部的方法，因此我们要想获取一些结果的时候会遇到scripts not permitted to use method…..的报错，我们需要在jenkins中进行设置，点击系统管理，在插件管理选项的下面有一项In-process Script Approval，进入进行设置</li>
+</ul>
+<p>我们定义的groovy函数主要代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">//org/iscas/yf/PipelineHelper.groovy</div><div class="line"></div><div class="line">package org.iscas.yf</div><div class="line">import hudson.tasks.test.AbstractTestResultAction</div><div class="line"></div><div class="line">def class PipelineHelper &#123;</div><div class="line">    def steps</div><div class="line">    //这个steps对象可以应用所有jenkins支持的step操作，通过steps.sh、steps.echo等方式调用</div><div class="line">    </div><div class="line">    PipelineHelper(steps) &#123;</div><div class="line">        this.steps = steps</div><div class="line">    &#125;</div><div class="line">	/*主要的函数，retryOrAbort，具体的思路是if语句判断测试是否通过，测试不通过就throw一个异常，这个函数catch到异常之后，由用户选择retry或者retry*/</div><div class="line">	</div><div class="line">    void retryOrAbort(final Closure&lt;?&gt; action, int maxAttempts, int timeoutSeconds, final int count = 0) &#123;</div><div class="line">    if (something wrong) then </div><div class="line">    	return retryOrAbort(...)</div></pre></td></tr></table></figure></p>
+<p>通过递归调用函数，实现重试。</p>
+<p>完整的代码可以在：<a href="https://github.com/YoooFeng/PipelineHelper" target="_blank" rel="external">https://github.com/YoooFeng/PipelineHelper</a><br>用于测试的项目：<a href="https://github.com/YoooFeng/junit-sample/" target="_blank" rel="external">https://github.com/YoooFeng/junit-sample/</a></p>
+<p>之后，我们点击jenkins的“立即构建”按钮，查看输出的控制台日志，可以发现我们的函数成功的重复执行了三次，实现了我们预期的功能。</p>
 
       
     </div>
@@ -456,9 +454,9 @@ gem ‘simplecov-rcov’, :require=&gt;false, group: :test
           
             <a href="/tags/jenkins/" rel="tag"># jenkins</a>
           
-            <a href="/tags/doclinks/" rel="tag"># doclinks</a>
+            <a href="/tags/jenkins-pipeline/" rel="tag"># jenkins pipeline</a>
           
-            <a href="/tags/测试/" rel="tag"># 测试</a>
+            <a href="/tags/jenkins-shared-library/" rel="tag"># jenkins shared library</a>
           
         </div>
       
@@ -471,8 +469,8 @@ gem ‘simplecov-rcov’, :require=&gt;false, group: :test
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/09/13/Passenger-Apache2帮助jenkins进行持续集成和部署/" rel="next" title="Passenger + Apache2帮助jenkins进行持续集成和部署">
-                <i class="fa fa-chevron-left"></i> Passenger + Apache2帮助jenkins进行持续集成和部署
+              <a href="/2017/09/14/Jenkins插件作用机制/" rel="next" title="Jenkins插件作用机制">
+                <i class="fa fa-chevron-left"></i> Jenkins插件作用机制
               </a>
             
           </div>
@@ -480,10 +478,6 @@ gem ‘simplecov-rcov’, :require=&gt;false, group: :test
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/09/14/Jenkins插件作用机制/" rel="prev" title="Jenkins插件作用机制">
-                Jenkins插件作用机制 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -650,7 +644,7 @@ var jiathis_config={
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Jenkins中ROR插件调研"><span class="nav-number">1.</span> <span class="nav-text">Jenkins中ROR插件调研</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Ruby-Plugin"><span class="nav-number">1.1.</span> <span class="nav-text">Ruby Plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RubyMetrics-plugin"><span class="nav-number">1.2.</span> <span class="nav-text">*RubyMetrics plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cucumber-report-plugin"><span class="nav-number">1.3.</span> <span class="nav-text">Cucumber-report-plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Junit-Plugin"><span class="nav-number">1.4.</span> <span class="nav-text">Junit Plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Brakeman-Plugin"><span class="nav-number">1.5.</span> <span class="nav-text">Brakeman Plugin</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决方案"><span class="nav-number">2.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于Blue-Ocean"><span class="nav-number">3.</span> <span class="nav-text">关于Blue Ocean</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#写在前面"><span class="nav-number">1.</span> <span class="nav-text">写在前面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Jenkins的Pipeline"><span class="nav-number">2.</span> <span class="nav-text">Jenkins的Pipeline</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Pipeline的源代码"><span class="nav-number">2.1.</span> <span class="nav-text">Pipeline的源代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#什么是shared-library"><span class="nav-number">2.2.</span> <span class="nav-text">什么是shared library</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Shared-library-从jenkins的机制说起"><span class="nav-number">2.3.</span> <span class="nav-text">Shared library - 从jenkins的机制说起</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在jenkinsfile中使用shared-library"><span class="nav-number">2.4.</span> <span class="nav-text">在jenkinsfile中使用shared library</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#开始实践"><span class="nav-number">3.</span> <span class="nav-text">开始实践</span></a></li></ol></div>
             
 
           </div>
@@ -803,9 +797,9 @@ var jiathis_config={
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2017/09/14/使用DocLinks插件展示ROR项目测试结果/';
-          this.page.identifier = '2017/09/14/使用DocLinks插件展示ROR项目测试结果/';
-          this.page.title = '使用DocLinks插件展示ROR项目测试结果';
+          this.page.url = 'http://yoursite.com/2017/10/30/Pipeline的优化与定制/';
+          this.page.identifier = '2017/10/30/Pipeline的优化与定制/';
+          this.page.title = 'Pipeline的优化与定制';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://YF.disqus.com/embed.js';
