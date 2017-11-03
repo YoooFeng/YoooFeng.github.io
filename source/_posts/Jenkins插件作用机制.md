@@ -1,12 +1,16 @@
 title: Jenkins插件作用机制
 author: YoooFeng
-date: 2017-09-14 19:34:25
+categories: 技术相关
 tags:
+  - jenkins插件
+  - jenkins
+date: 2017-09-14 19:34:25
 ---
 # Jenkins插件作用机制调研
 Jenkins的插件实际上就是一个一个的Java class，jenkins 通过单独的类加载器加载每个插件以避免插件之间产生冲突。插件就像 Jenkins 内置的其他类一样参与到系统的活动中。另外，插件可以通过 XStream 持久化，可以由 Jelly 提供视图技术，可以提供图片等静态资源，插件中所有的功能可以无缝的加入到 Jenkins 内置的功能上。
 
 我们开发的插件要想集成到jenkins中，在编写的时候就需要继承对应的jenkins提供的模板类，比方说我们要想编写一个参数类的插件，就需要（必须）继承jenkins官方提供的ParameterDefinition模板类，所有参数相关的插件都需要继承这个类。
+<!-- more -->
 
 ParameterDefinition这个类中提前写好了配置job时输入参数的文本框，只有继承这个类，才能在job配置页面中的Add Parameter下拉框中看到我们编写的插件。换句话说，Jenkins使用继承模板类的方式将Jenkins本身与插件的接口提供给我们，我们也只能通过继承模板类的方式将我们的插件集成到jenkins中。这些模板中有一些基本的方法，例如文本框的名称，一些图标的定义等，我们可以通过override这些方法来进行个性化设计。
 
@@ -32,8 +36,7 @@ Jenkins支持使用USER_TOKEN和USER_NAME&USER_PASSWORD的方式进行权限判�
 为了弄清楚jenkins插件的具体实现机制，我以Cucumber-reports-Plugin这个插件为例对Jenkins插件的源代码进行分析。
 
 下面是cucumber插件的项目结构：
-
- (图片structure)
+![structure](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/jenkins-plugin.pic/cucumber_pi_structure.png)
 
 整个项目的组织结构如上图所示，其中主要部分由CucumberReportBaseAction、CucumberReportDescriptor、CucumberReportProjectAction、CucumberReportPulisher、SafeArchiveServingAction、SafeArchiveServingRunAction等六个Java类组成。
 
@@ -47,8 +50,7 @@ Jenkins支持使用USER_TOKEN和USER_NAME&USER_PASSWORD的方式进行权限判�
 
 	public class CucumberReportDescriptor extends BuildStepDescriptor<Publisher> {
 
-这个类继承自BuildStepDescriptor，使用的是Publisher模板。BuildStepDescriptor有两个template，一个是Builder，一个是Publisher，当指定模板为Builder时，说明这个插件是作用在构建过程中的，这个插件出现在jenkins项目设置中的 构建 一栏；当指定模板为Publisher时，说明这个插件是项目构建结束之后发挥作用的，出现在 构建后操作 一栏。下面这张图是Cucumber插件Post-build Action的配置框：
-（图片：post-build-action）
+这个类继承自BuildStepDescriptor，使用的是Publisher模板。BuildStepDescriptor有两个template，一个是Builder，一个是Publisher，当指定模板为Builder时，说明这个插件是作用在构建过程中的，这个插件出现在jenkins项目设置中的 构建 一栏；当指定模板为Publisher时，说明这个插件是项目构建结束之后发挥作用的，出现在 构建后操作 一栏。
 
 Cucumber插件的测试报告显然是需要等项目成功构建之后才能发挥作用的，所以是指定为Publisher。在 构建 或者 构建后操作 选择使用此插件后，需要用户输入的一些参数也是在这里指定的，比如下面的几行代码：
 
@@ -71,7 +73,7 @@ Result.UNSTABLE.toString()));
 	public class CucumberReportProjectAction extends CucumberReportBaseAction implements ProminentProjectAction {
 
 继承自之前的CucumberReportBaseAction类，同时实现了ProminentProjectAction接口。之前的CucumberReportBaseAction类只是设置了插件的名称、图标等，这个类就具体指定了这个插件的子界面链接出现在项目的主页面，下面这张图指的就是项目的主界面：
-（图片project-page）
+![project-page](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/jenkins-plugin.pic/project_page.png)
 
 
 ## *CucumberReportPulisher
@@ -130,7 +132,8 @@ Result.UNSTABLE.toString()));
 + repositories：执行hpi:create命令需要。
 
 在IDE中进行配置，以IDEA为例：
- （图片：settings-idea）
+
+![idea-config](https://raw.githubusercontent.com/YoooFeng/YoooFeng.github.io/hexo/source/_posts/jenkins-plugin.pic/idea_config.png)
 
 
 ## 创建插件开发项目
@@ -162,7 +165,7 @@ Enter the artifactId of your plugin (normally without '-plugin' suffix): demo
 ## 打包插件
 完成开发后，只需要使用命令：
 
-$ mvn clean install
+	$ mvn clean install
 
 就可以将编写的插件代码打包成一个.hpi文件（相当于一个jar包），然后上传到jenkins的服务器，这样就可以安装使用插件了。
 
